@@ -1,0 +1,6 @@
+[
+  {"id":"t1","year":2016,"title":"Admission Day","type":"admission","photo":"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=60","notes":"Joined the care home."},
+  {"id":"t2","year":2018,"title":"First School Play","type":"achievement","photo":"https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60","notes":"Played the lead role."},
+  {"id":"t3","year":2020,"title":"Art Fair Award","type":"award","photo":"https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=60","notes":"Won Best Creative."},
+  {"id":"t4","year":2023,"title":"Scholarship","type":"milestone","photo":"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=60","notes":"Scholarship awarded for academic excellence."}
+]

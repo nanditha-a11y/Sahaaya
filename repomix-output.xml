@@ -1,0 +1,2492 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/
+  components/
+    ActivityTimeline.tsx
+    Card.tsx
+    ChartArea.tsx
+    ChartCard.tsx
+    ChildCard.tsx
+    EmptyState.tsx
+    IllustrationSection.tsx
+    ImpactCard.tsx
+    Metric.tsx
+    MetricCard.tsx
+    Navbar.tsx
+    ProfileCard.tsx
+    ProgressCard.tsx
+    RequireRole.tsx
+    ResourceCard.tsx
+    Sidebar.tsx
+    VintageIllustration.tsx
+  contexts/
+    RoleContext.tsx
+  data/
+    alumni.json
+    analytics.json
+    children.json
+    dreams.json
+    locations.json
+    messages.json
+    timeline.json
+    tree.json
+    vault.json
+  i18n/
+    locales/
+      en.json
+      hi.json
+      kn.json
+      kok.json
+      ta.json
+      te.json
+    en.json
+    hi.json
+    i18n.ts
+    kn.json
+    translations.ts
+    useTranslation.tsx
+  modules/
+    AlumniMuseum.tsx
+    ChildGrowthTree.tsx
+    DreamBuilder.tsx
+    ImpactMap.tsx
+    LegacyDashboard.tsx
+    LifeTimeline.tsx
+    MemoryVault.tsx
+    MentorMarketplace.tsx
+    MessageWall.tsx
+    WellnessRadar.tsx
+  pages/
+    admin/
+      AdminHome.tsx
+    donor/
+      DonorHome.tsx
+    student/
+      StudentHome.tsx
+    ChildManagement.tsx
+    Dashboard.tsx
+    Donors.tsx
+    Education.tsx
+    Health.tsx
+    ImpactShowcase.tsx
+    Landing.tsx
+    Mentorship.tsx
+    Resources.tsx
+    RoleSelector.tsx
+    Scholarships.tsx
+  App.tsx
+  main.tsx
+  styles.css
+index.html
+package.json
+postcss.config.cjs
+README.md
+tailwind.config.cjs
+tsconfig.json
+vite.config.ts
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/components/ActivityTimeline.tsx">
+import React from 'react'
+
+export default function ActivityTimeline({events}:{events:Array<{time:string, title:string, desc?:string}>}){
+  return (
+    <div className="glass-card p-4 rounded-lg">
+      <div className="text-sm handwritten" style={{color:'#6b4c3b'}}>Recent Activities</div>
+      <ul className="mt-3 space-y-3">
+        {events.map((e, idx)=> (
+          <li key={idx} className="flex gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#c98b5a] mt-2" />
+            <div>
+              <div className="text-sm font-semibold" style={{color:'#4b3628'}}>{e.title} <span className="text-xs text-slate-500">· {e.time}</span></div>
+              <div className="text-xs text-slate-600">{e.desc}</div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/Card.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function Card({children,className}:{children:React.ReactNode,className?:string}){
+  return (
+    <motion.figure whileHover={{ rotate: -1, y: -6 }} className={`polaroid ${className || ''}`}>
+      {children}
+    </motion.figure>
+  )
+}
+</file>
+
+<file path="src/components/ChartArea.tsx">
+import React from 'react'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+export default function ChartArea({data}:{data:any[]}){
+  return (
+    <div className="w-full h-64 glass-card p-4 rounded-2xl">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <XAxis dataKey="name" stroke="#9CA3AF" />
+          <YAxis stroke="#9CA3AF" />
+          <Tooltip />
+          <Line type="monotone" dataKey="value" stroke="#7c3aed" strokeWidth={3} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/ChartCard.tsx">
+import React from 'react'
+
+export default function ChartCard({title, children}:{title:string, children:React.ReactNode}){
+  return (
+    <div className="glass-card p-4 rounded-lg">
+      <div className="text-sm" style={{color:'#6b4c3b'}}>{title}</div>
+      <div className="mt-3">{children}</div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/ChildCard.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function ChildCard({name, age, progress}:{name:string, age:number, progress?:number}){
+  return (
+    <motion.div className="glass-card p-4 rounded-lg" whileHover={{scale:1.01}}>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="handwritten text-lg" style={{color:'#4b3628'}}>{name}</div>
+          <div className="text-sm" style={{color:'#6b4c3b'}}>{age} years</div>
+        </div>
+        <div className="text-sm text-slate-600">Progress: {progress ?? 0}%</div>
+      </div>
+    </motion.div>
+  )
+}
+</file>
+
+<file path="src/components/EmptyState.tsx">
+import React from 'react'
+import VintageIllustration from './VintageIllustration'
+
+export default function EmptyState({title, desc}:{title:string, desc?:string}){
+  return (
+    <div className="glass-card p-6 rounded-lg text-center">
+      <div className="mx-auto mb-3">
+        <VintageIllustration variant="landing" />
+      </div>
+      <div className="text-lg handwritten mt-3" style={{color:'#4b3628'}}>{title}</div>
+      {desc && <div className="text-sm mt-2 text-slate-600">{desc}</div>}
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/IllustrationSection.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function IllustrationSection({type='generic', title, description}:{type?:string, title?:string, description?:string}){
+  const float = { y:[0,-6,0], transition:{duration:4, repeat: Infinity} }
+  return (
+    <div className="flex items-center gap-6">
+      <motion.div animate={float as any} className="w-60 h-44 bg-[linear-gradient(#fbf6f0,#f6efe6)] rounded-xl flex items-center justify-center" style={{boxShadow:'0 6px 20px rgba(0,0,0,0.04)'}}>
+        {type==='landing' && (
+          <svg width="160" height="120" viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="20" width="120" height="70" rx="8" fill="#fff2e8" stroke="#eedfcf"/>
+            <circle cx="110" cy="40" r="14" fill="#d9b08a" />
+            <rect x="18" y="36" width="40" height="8" rx="2" fill="#c98b5a"/>
+            <rect x="18" y="50" width="60" height="6" rx="2" fill="#f0d7c2"/>
+          </svg>
+        )}
+        {type==='admin' && (
+          <svg width="140" height="100" viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="10" width="120" height="60" rx="10" fill="#fff6f0" stroke="#e6d6c6"/>
+            <rect x="18" y="22" width="36" height="8" rx="3" fill="#c98b5a"/>
+            <rect x="18" y="36" width="90" height="8" rx="3" fill="#f0d7c2"/>
+          </svg>
+        )}
+        {type==='student' && (
+          <svg width="140" height="100" viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="10" width="120" height="60" rx="10" fill="#fff6f0" stroke="#e6d6c6"/>
+            <circle cx="34" cy="40" r="12" fill="#c98b5a" />
+            <rect x="52" y="30" width="56" height="10" rx="3" fill="#f0d7c2"/>
+          </svg>
+        )}
+        {type==='donor' && (
+          <svg width="140" height="100" viewBox="0 0 140 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="8" y="10" width="120" height="60" rx="10" fill="#fff6f0" stroke="#e6d6c6"/>
+            <path d="M30 60 C45 40, 80 40, 100 60" stroke="#c98b5a" strokeWidth="3" fill="none" />
+            <circle cx="100" cy="50" r="6" fill="#d9b08a" />
+          </svg>
+        )}
+      </motion.div>
+      <div>
+        {title && <div className="handwritten text-xl" style={{color:'#4b3628'}}>{title}</div>}
+        {description && <div className="text-sm mt-1" style={{color:'#6b4c3b'}}>{description}</div>}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/ImpactCard.tsx">
+import React from 'react'
+
+export default function ImpactCard({title, delta}:{title:string, delta:string}){
+  return (
+    <div className="glass-card p-4 rounded-lg">
+      <div className="text-sm" style={{color:'#6b4c3b'}}>{title}</div>
+      <div className="text-2xl font-bold" style={{color:'#4b3628'}}>{delta}</div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/Metric.tsx">
+import React, { useEffect, useState } from 'react'
+import { motion, useSpring } from 'framer-motion'
+
+export default function Metric({value,label}:{value:number,label:string}){
+  const [num,setNum] = useState(0)
+  useEffect(()=>{
+    let start = 0
+    const dur = 1200
+    const diff = value - start
+    const step = 16
+    let elapsed = 0
+    const id = setInterval(()=>{
+      elapsed += step
+      const progress = Math.min(1, elapsed / dur)
+      setNum(Math.round(start + diff * progress))
+      if(progress>=1) clearInterval(id)
+    }, step)
+    return ()=> clearInterval(id)
+  },[value])
+
+  return (
+    <div className="flex flex-col">
+      <div className="text-3xl font-bold" style={{color:'#6b4c3b'}}>{num}</div>
+      <div className="text-sm" style={{color:'#4b3628'}}>{label}</div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/MetricCard.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function MetricCard({title, value, icon, className}:{title:string, value:React.ReactNode, icon?:React.ReactNode, className?:string}){
+  return (
+    <motion.div whileHover={{y:-4}} className={`glass-card p-4 rounded-lg shadow-sm ${className||''}`}>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-xs" style={{color:'#6b4c3b'}}>{title}</div>
+          <div className="text-2xl font-semibold" style={{color:'#4b3628'}}>{value}</div>
+        </div>
+        <div className="text-3xl text-vintageBrown">{icon}</div>
+      </div>
+    </motion.div>
+  )
+}
+</file>
+
+<file path="src/components/Navbar.tsx">
+import React from 'react'
+import { Menu } from 'lucide-react'
+import { useTranslation } from '../i18n/useTranslation'
+import { useRole } from '../contexts/RoleContext'
+
+export default function Navbar({ onMenu }:{onMenu?: ()=>void}){
+  const { t, lang, setLang } = useTranslation() as any
+  const { role, setRole } = useRole()
+
+  const languages = [
+    {code:'en', label: 'English'},
+    {code:'kn', label: 'ಕನ್ನಡ Kannada'},
+    {code:'hi', label: 'हिन्दी Hindi'},
+    {code:'te', label: 'తెలుగు Telugu'},
+    {code:'ta', label: 'தமிழ் Tamil'},
+    {code:'kok', label: 'कोंकणी Konkani'}
+  ]
+
+  return (
+    <header className="py-4 px-6 flex items-center justify-between glass-card paper-edge">
+      <div className="flex items-center gap-4">
+        <button onClick={onMenu} className="p-2 rounded-lg hover:bg-[#00000005] text-vintageBrown"><Menu/></button>
+        <div className="text-2xl font-bold handwritten" style={{color:'#6b4c3b'}}>SAHAAYA</div>
+        <div className="text-sm handwritten ml-2" style={{color:'#4b3628'}}>Empowering Every Child</div>
+      </div>
+      <nav className="flex items-center gap-4 handwritten text-sm" style={{color:'#3b2b20'}}>
+        <div className="flex items-center gap-3">
+          <select value={lang} onChange={e=>setLang(e.target.value)} className="rounded p-1 bg-white/80 text-sm">
+            {languages.map(l=> <option key={l.code} value={l.code}>{l.label}</option>)}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs" style={{color:'#5a4433'}}>{t('Language')}</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <select value={role||'admin'} onChange={e=>setRole(e.target.value as any)} className="rounded p-1 bg-white/80 text-sm">
+            <option value="admin">Admin View</option>
+            <option value="student">Student View</option>
+            <option value="donor">Donor View</option>
+          </select>
+        </div>
+      </nav>
+    </header>
+  )
+}
+</file>
+
+<file path="src/components/ProfileCard.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function ProfileCard({name, role, avatar, children}:{name:string, role?:string, avatar?:string, children?:React.ReactNode}){
+  return (
+    <motion.div className="glass-card p-4 rounded-lg flex items-center gap-4" whileHover={{scale:1.01}}>
+      <div className="w-16 h-16 rounded-full bg-[#f3e9df] flex items-center justify-center" style={{boxShadow:'inset 0 1px 0 rgba(0,0,0,0.03)'}}>
+        {avatar? <img src={avatar} alt={name} className="w-16 h-16 rounded-full object-cover"/> : <div className="handwritten">🙂</div>}
+      </div>
+      <div>
+        <div className="handwritten text-lg" style={{color:'#4b3628'}}>{name}</div>
+        <div className="text-sm" style={{color:'#6b4c3b'}}>{role}</div>
+        <div className="mt-2 text-xs text-slate-600">{children}</div>
+      </div>
+    </motion.div>
+  )
+}
+</file>
+
+<file path="src/components/ProgressCard.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+
+export default function ProgressCard({title, percent}:{title:string, percent:number}){
+  const stroke = 10
+  const r = 36
+  const c = 2 * Math.PI * r
+  const dash = c * (percent/100)
+  return (
+    <motion.div className="glass-card p-4 rounded-lg flex items-center gap-4" whileHover={{y:-3}}>
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <g transform="translate(48,48)">
+          <circle r={r} stroke="#efe7de" strokeWidth={stroke} fill="none" />
+          <circle r={r} stroke="#c98b5a" strokeWidth={stroke} strokeDasharray={`${dash} ${c-dash}`} strokeLinecap="round" fill="none" transform="rotate(-90)" />
+        </g>
+      </svg>
+      <div>
+        <div className="text-sm" style={{color:'#6b4c3b'}}>{title}</div>
+        <div className="text-2xl font-semibold" style={{color:'#4b3628'}}>{percent}%</div>
+      </div>
+    </motion.div>
+  )
+}
+</file>
+
+<file path="src/components/RequireRole.tsx">
+import React from 'react'
+import { Navigate } from 'react-router-dom'
+import { useRole } from '../contexts/RoleContext'
+
+export default function RequireRole({children, allowed}:{children:JSX.Element, allowed: Array<'admin'|'student'|'donor'>}){
+  const { role } = useRole()
+  if(!allowed.includes(role)){
+    return <Navigate to="/" replace />
+  }
+  return children
+}
+</file>
+
+<file path="src/components/ResourceCard.tsx">
+import React from 'react'
+
+export default function ResourceCard({name, count}:{name:string, count:number}){
+  return (
+    <div className="glass-card p-4 rounded-lg">
+      <div className="text-sm" style={{color:'#6b4c3b'}}>{name}</div>
+      <div className="text-2xl font-bold" style={{color:'#4b3628'}}>{count}</div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/components/Sidebar.tsx">
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+import { useTranslation } from '../i18n/useTranslation'
+import { useRole } from '../contexts/RoleContext'
+
+export default function Sidebar({ open }:{open?:boolean}){
+  const { t } = useTranslation() as any
+  const { role } = useRole()
+
+  const adminNav = [
+    {to:'/admin', label: 'Dashboard'},
+    {to:'/children', label: 'Children'},
+    {to:'/education', label: 'Education'},
+    {to:'/health', label: 'Health'},
+    {to:'/resources', label: 'Resources'},
+    {to:'/donors', label: 'Donors'},
+    {to:'/scholarships', label: 'Scholarships'},
+    {to:'/mentorship', label: 'Mentorship'},
+    {to:'/impact', label: 'Impact'},
+    {to:'/vault', label: 'Vault'},
+    {to:'/impact-showcase', label: 'ImpactShowcase'}
+  ]
+
+  const studentNav = [
+    {to:'/student', label: 'Home'},
+    {to:'/children', label: 'Children'},
+    {to:'/education', label: 'Education'},
+    {to:'/resources', label: 'Resources'},
+    {to:'/scholarships', label: 'Scholarships'},
+    {to:'/mentorship', label: 'Mentorship'},
+    {to:'/health', label: 'Health'},
+    {to:'/museum', label: 'ImpactShowcase'},
+    {to:'/wall', label: 'Vault'}
+  ]
+
+  const donorNav = [
+    {to:'/donor', label: 'Dashboard'},
+    {to:'/donors', label: 'Donations'},
+    {to:'/children', label: 'Children'},
+    {to:'/impact-showcase', label: 'ImpactShowcase'},
+    {to:'/resources', label: 'Resources'},
+    {to:'/museum', label: 'Vault'}
+  ]
+
+  const navSet = role === 'admin' ? adminNav : role === 'student' ? studentNav : donorNav
+
+  return (
+    <aside className={`w-72 p-4 space-y-4 hidden md:block`}> 
+      <div className="glass-card p-4 rounded-xl-2">
+        <div className="text-sm" style={{color:'#6b4c3b'}}>{t('Home')}</div>
+        <nav className="mt-3 flex flex-col gap-2 handwritten" style={{color:'#4b3628'}}>
+          {navSet.map(n=> (
+            <NavLink key={n.to} to={n.to} className="p-2 rounded-lg hover:bg-white/5">{t(n.label)}</NavLink>
+          ))}
+        </nav>
+      </div>
+    </aside>
+  )
+}
+</file>
+
+<file path="src/components/VintageIllustration.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+
+type Props = {
+  variant?: 'landing'|'admin'|'student'|'donor'|'small'
+  title?: string
+  description?: string
+}
+
+export default function VintageIllustration({variant='landing', title, description}:Props){
+  const float = { y:[0,-4,0], transition:{duration:5, repeat: Infinity} }
+  return (
+    <div className="flex items-center gap-4">
+      <motion.div animate={float as any} className={`vintage-illustration p-3 rounded-xl`}>
+        <svg width="220" height={variant==='small'?80:140} viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="216" height="136" rx="12" fill="#fffaf3" stroke="#eaddcf"/>
+          {/* hand-drawn group */}
+          <g stroke="#7a4f35" strokeWidth="1.2" fill="#f7e9dd">
+            {variant==='landing' && (
+              <>
+                <path d="M30 100 q20 -30 60 -20 q20 6 40 -6 q20 -12 50 12" fill="#f7e6d9" stroke="#7a4f35"/>
+                <circle cx="60" cy="60" r="10" fill="#d9b08a" />
+                <rect x="80" y="50" width="50" height="8" rx="2" fill="#e8d2bf" />
+                <path d="M30 110 q40 -18 80 -18 q40 0 60 10" stroke="#7a4f35" fill="none"/>
+              </>
+            )}
+            {variant==='admin' && (
+              <>
+                <rect x="24" y="36" width="68" height="10" rx="2" fill="#e8d2bf" />
+                <rect x="24" y="52" width="140" height="8" rx="2" fill="#f1dcc6" />
+                <path d="M20 100 q40 -22 180 0" stroke="#7a4f35" fill="none"/>
+              </>
+            )}
+            {variant==='student' && (
+              <>
+                <circle cx="46" cy="56" r="12" fill="#d9b08a"/>
+                <rect x="70" y="44" width="70" height="10" rx="2" fill="#f1dcc6" />
+                <path d="M20 100 q30 -20 70 -10 q40 12 80 10" stroke="#7a4f35" fill="none"/>
+              </>
+            )}
+            {variant==='donor' && (
+              <>
+                <path d="M30 70 q30 -20 80 -6 q40 12 60 6" stroke="#7a4f35" fill="#f3e2d2" />
+                <circle cx="160" cy="48" r="8" fill="#c98b5a" />
+                <path d="M20 100 q50 -20 180 0" stroke="#7a4f35" fill="none"/>
+              </>
+            )}
+          </g>
+          {/* decorative corner */}
+          <path d="M12 18 q8 -6 20 0" stroke="#e0c9b1" strokeWidth="1.2" fill="none" />
+        </svg>
+      </motion.div>
+      <div className="hidden sm:block max-w-xs">
+        {title && <div className="handwritten text-lg" style={{color:'#4b3628'}}>{title}</div>}
+        {description && <div className="text-sm mt-1" style={{color:'#6b4c3b'}}>{description}</div>}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/contexts/RoleContext.tsx">
+import React, { createContext, useContext, useEffect, useState } from 'react'
+
+type Role = 'admin'|'student'|'donor'
+
+const RoleContext = createContext({
+  role: 'admin' as Role,
+  setRole: (r: Role)=>{}
+})
+
+export const RoleProvider: React.FC<{children:React.ReactNode}> = ({children})=>{
+  const [role, setRole] = useState<Role>(()=> (localStorage.getItem('sahaaya:role') as Role) || 'admin')
+
+  useEffect(()=>{
+    localStorage.setItem('sahaaya:role', role)
+  },[role])
+
+  return <RoleContext.Provider value={{role, setRole}}>{children}</RoleContext.Provider>
+}
+
+export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Role)=>void}
+</file>
+
+<file path="src/data/alumni.json">
+[
+  {"id":"al1","name":"Neha","photo":"https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60","title":"Software Engineer","story":"From orphanage to TechCorp engineer. Mentored by alumni network.","achievements":["B.Tech","Mentor Hours:120"],"timeline":[{"year":2018,"note":"Graduated High School"},{"year":2022,"note":"Graduated College"}]},
+  {"id":"al2","name":"Amit","photo":"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=60","title":"Teacher","story":"Now teaching local children and giving back.","achievements":["B.Ed","Scholarship Recipient"],"timeline":[{"year":2017,"note":"Completed Training"},{"year":2019,"note":"Started Teaching"}]} 
+]
+</file>
+
+<file path="src/data/analytics.json">
+{
+  "ageDistribution": [
+    {"name":"0-5","value":120},
+    {"name":"6-10","value":420},
+    {"name":"11-15","value":380},
+    {"name":"16+","value":320}
+  ],
+  "donationTrends": [
+    {"name":"Jan","value":1200},
+    {"name":"Feb","value":900},
+    {"name":"Mar","value":1500},
+    {"name":"Apr","value":1800},
+    {"name":"May","value":2100}
+  ]
+}
+</file>
+
+<file path="src/data/children.json">
+[
+  { "id": "c1", "name": "Asha", "age": 8, "education": "Grade 3", "health": "Good", "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60" },
+  { "id": "c2", "name": "Rahul", "age": 11, "education": "Grade 6", "health": "Fair", "photo": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=60" },
+  { "id": "c3", "name": "Maya", "age": 14, "education": "Grade 9", "health": "Good", "photo": "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=60" }
+]
+</file>
+
+<file path="src/data/dreams.json">
+{
+  "goals":[
+    {"id":"g1","title":"Doctor","skills":["Biology","Physics","Communication"],"mentors":["Dr. Kumar"]},
+    {"id":"g2","title":"Engineer","skills":["Math","Physics","Problem Solving"],"mentors":["Eng. Rao"]},
+    {"id":"g3","title":"Teacher","skills":["Subject Knowledge","Patience","Communication"],"mentors":["Ms. Iyer"]},
+    {"id":"g4","title":"Artist","skills":["Drawing","Creativity","Portfolio"],"mentors":["Artist Meena"]},
+    {"id":"g5","title":"Entrepreneur","skills":["Business","Leadership","Finance"],"mentors":["Mr. Shah"]}
+  ],
+  "completedSkills":["Reading","Drawing","Basic Math"]
+}
+</file>
+
+<file path="src/data/locations.json">
+{
+  "center": { "x": 50, "y": 50 },
+  "orphanages": [
+    { "id": "o1", "name": "Hope Home Mumbai", "x": 72, "y": 68, "city":"Mumbai", "info":"Supports 120 children" },
+    { "id": "o2", "name": "Sunrise Kolkata", "x": 92, "y": 40, "city":"Kolkata", "info":"Education programs" },
+    { "id": "o3", "name": "Meera Care Chennai", "x": 85, "y": 78, "city":"Chennai", "info":"Health initiatives" }
+  ],
+  "donors": [
+    { "id":"d1","name":"R. Sharma","x":40,"y":30,"city":"Jaipur","info":"Monthly donor" },
+    { "id":"d2","name":"Global Philanthropy","x":20,"y":45,"city":"Delhi","info":"Major donor" }
+  ],
+  "alumni": [
+    { "id":"a1","name":"Neha","x":60,"y":55,"city":"Bengaluru","info":"Engineer at TechCorp" },
+    { "id":"a2","name":"Amit","x":30,"y":72,"city":"Pune","info":"School Teacher" }
+  ],
+  "mentors": [
+    { "id":"m1","name":"Dr. Kumar","x":55,"y":28,"city":"Lucknow","info":"Medical mentor" },
+    { "id":"m2","name":"Ms. Iyer","x":48,"y":60,"city":"Bengaluru","info":"Education mentor" }
+  ]
+}
+</file>
+
+<file path="src/data/messages.json">
+[
+  {"id":"m1","from":"R. Sharma","role":"Donor","text":"Keep shining, little ones. Your future is bright!","date":"2024-05-12"},
+  {"id":"m2","from":"Amit","role":"Alumnus","text":"Grateful for the support that helped me become a teacher.","date":"2023-11-04"},
+  {"id":"m3","from":"Dr. Kumar","role":"Mentor","text":"Always pursue curiosity and health.","date":"2025-01-21"},
+  {"id":"m4","from":"Sonal","role":"Volunteer","text":"Your sketches made my day — keep creating!","date":"2024-09-03"}
+]
+</file>
+
+<file path="src/data/timeline.json">
+[
+  {"id":"t1","year":2016,"title":"Admission Day","type":"admission","photo":"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=60","notes":"Joined the care home."},
+  {"id":"t2","year":2018,"title":"First School Play","type":"achievement","photo":"https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60","notes":"Played the lead role."},
+  {"id":"t3","year":2020,"title":"Art Fair Award","type":"award","photo":"https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&q=60","notes":"Won Best Creative."},
+  {"id":"t4","year":2023,"title":"Scholarship","type":"milestone","photo":"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&q=60","notes":"Scholarship awarded for academic excellence."}
+]
+</file>
+
+<file path="src/data/tree.json">
+{
+  "id":"c1",
+  "name":"Asha",
+  "roots": [{"label":"Admitted","year":2016}],
+  "branches": [
+    {"id":"b1","label":"Literacy","skills":["Reading","Writing"]},
+    {"id":"b2","label":"Art","skills":["Drawing","Crafts"]},
+    {"id":"b3","label":"Sports","skills":["Football","Running"]}
+  ],
+  "leaves": [
+    {"id":"l1","branchId":"b1","label":"Completed Grade 3"},
+    {"id":"l2","branchId":"b2","label":"Art Fair Winner"},
+    {"id":"l3","branchId":"b3","label":"Inter-school Match"}
+  ],
+  "flowers":[{"id":"f1","label":"Best Creative"}],
+  "fruits":[{"id":"fr1","label":"Reading Milestone"}]
+}
+</file>
+
+<file path="src/data/vault.json">
+{
+  "items": [
+    {"id":"v1","title":"Drawing - Summer","type":"drawing","src":"https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&q=60","desc":"Crayon drawing of home."},
+    {"id":"v2","title":"Certificate - 2020","type":"certificate","src":"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=60","desc":"Participation certificate."},
+    {"id":"v3","title":"Photo - School Play","type":"photo","src":"https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=60","desc":"On stage debut."},
+    {"id":"v4","title":"Letter from Mentor","type":"letter","src":"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=60","desc":"Encouraging handwritten letter."}
+  ]
+}
+</file>
+
+<file path="src/i18n/locales/en.json">
+{
+  "Home": "Home",
+  "Dashboard": "Dashboard",
+  "Children": "Children",
+  "Education": "Education",
+  "Health": "Health",
+  "Resources": "Resources",
+  "Donors": "Donors",
+  "Scholarships": "Scholarships",
+  "Mentorship": "Mentorship",
+  "Impact": "Impact Map",
+  "Vault": "Memory Vault",
+  "ImpactShowcase": "Impact Showcase",
+  "RoleSelectTitle": "Choose your role",
+  "AdminPortal": "Admin Portal",
+  "StudentPortal": "Student Portal",
+  "DonorPortal": "Donor Portal",
+  "SelectRole": "Select a role to continue",
+  "Language": "Language",
+  "WelcomeBackAdmin": "Welcome back, Administrator",
+  "OverviewLine": "Overview of child welfare operations",
+  "KeepLearning": "Keep learning, your journey matters",
+  "ThankYouDonate": "Thank you for your support",
+  "EmpoweringTitle": "Empowering every child, building brighter futures"
+}
+</file>
+
+<file path="src/i18n/locales/hi.json">
+{
+  "Home": "मुख पृष्ठ",
+  "Dashboard": "डैशबोर्ड",
+  "Children": "बच्चे",
+  "Education": "शिक्षा",
+  "Health": "स्वास्थ्य",
+  "Resources": "संसाधन",
+  "Donors": "दाता",
+  "Scholarships": "छात्रवृत्ति",
+  "Mentorship": "मार्गदर्शन",
+  "Impact": "प्रभाव मानचित्र",
+  "Vault": "स्मृति भंडार",
+  "ImpactShowcase": "प्रभाव प्रदर्शन",
+  "RoleSelectTitle": "अपना रोल चुनें",
+  "AdminPortal": "प्रशासन पोर्टल",
+  "StudentPortal": "छात्र पोर्टल",
+  "DonorPortal": "दाता पोर्टल",
+  "SelectRole": "जारी रखने के लिए रोल चुनें",
+  "Language": "भाषा",
+  "WelcomeBackAdmin": "वापसी पर स्वागत है, व्यवस्थापक",
+  "OverviewLine": "बाल कल्याण संचालन का अवलोकन",
+  "KeepLearning": "सीखते रहो, तुम्हारी यात्रा मायने रखती है",
+  "ThankYouDonate": "आपके समर्थन के लिए धन्यवाद",
+  "EmpoweringTitle": "हर बच्चे को सशक्त बनाना, उज्जवल भविष्य का निर्माण"
+}
+</file>
+
+<file path="src/i18n/locales/kn.json">
+{
+  "Home": "ಮುಖಪುಟ",
+  "Dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+  "Children": "ಮಕ್ಕಳು",
+  "Education": "ಶಿಕ್ಷಣ",
+  "Health": "ಆರೋಗ್ಯ",
+  "Resources": "ಸಂಪನ್ಮೂಲಗಳು",
+  "Donors": "ದಾನಿಗಳು",
+  "Scholarships": "ವಿದ್ಯಾ ಸಹಾಯ",
+  "Mentorship": "ಮೆಂಟರ್ಷಿಪ್",
+  "Impact": "ಪ್ರಭಾವ ನಕ್ಷೆ",
+  "Vault": "ಸ್ಮೃತಿ ಗಾಯ",
+  "ImpactShowcase": "ಪ್ರಭಾವ ಪ್ರದರ್ಶನ",
+  "RoleSelectTitle": "ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆರಿಸಿ",
+  "AdminPortal": "ಆಡಳಿತ ಪೋರ್ಟಲ್",
+  "StudentPortal": "ವಿದ್ಯಾರ್ಥಿ ಪೋರ್ಟಲ್",
+  "DonorPortal": "ದಾನಿದಾರರ ಪೋರ್ಟಲ್",
+  "SelectRole": "ಮುಂದುವರಿಸಲು ಪಾತ್ರವನ್ನು ಆರಿಸಿ",
+  "Language": "ಭಾಷೆ",
+  "WelcomeBackAdmin": "ಮುಂದಿನ ಬಾರಿಗೆ ಸ್ವಾಗತ, ನಿರ್ವಾಹಕ",
+  "OverviewLine": "ಮಕ್ಕಳ ಕಲ್ಯಾಣ ಕಾರ್ಯಚಟುವಟಿಕೆಗಳ ಅವಲೋಕನ",
+  "KeepLearning": "ಕೆಲಸಮಾಡೋ, ನಿನ್ನ ಯಾತ್ರೆ ಮಹತ್ವವುಳ್ಳದು",
+  "ThankYouDonate": "ನಿಮ್ಮ ಬೆಂಬಲಕ್ಕೆ ಧನ್ಯವಾದಗಳು",
+  "EmpoweringTitle": "ಪ್ರತಿ ಮಕ್ಕಳೂ ಹಿಡಿತ ಪಡೆಯಲಿ, ಬೆಳಗಿನ ಭವಿಷ್ಯ ನಿರ್ಮಿಸೋಣ"
+}
+</file>
+
+<file path="src/i18n/locales/kok.json">
+{
+  "Home": "घरे",
+  "Dashboard": "डॅशबोर्ड",
+  "Children": "बाळा",
+  "Education": "शिक्षण",
+  "Health": "आरोग्य",
+  "Resources": "स्रोत",
+  "Donors": "दानदार",
+  "Scholarships": "छात्रवृत्ती",
+  "Mentorship": "मार्गदर्शन",
+  "Impact": "परिणाम नकाशा",
+  "Vault": "स्मृती पेटी",
+  "ImpactShowcase": "परिणाम प्रदर्शित",
+  "RoleSelectTitle": "तुमचें रोल निवडा",
+  "AdminPortal": "प्रशासक पोर्टल",
+  "StudentPortal": "विद्यार्थी पोर्टल",
+  "DonorPortal": "दानदार पोर्टल",
+  "SelectRole": "सुरू करपाक रोल निवडा",
+  "Language": "भाषा",
+  "WelcomeBackAdmin": "पुन्हेर स्वागत, प्रशासक",
+  "OverviewLine": "बाल कल्याण क्रियाकलापांची झलक",
+  "KeepLearning": "शिका, तुमचो प्रवास महत्वाचो आसा",
+  "ThankYouDonate": "तुमच्या मदतीबद्दल आभार",
+  "EmpoweringTitle": "प्रत्येक बाळाक शक्‍ती देतां, उज्जवल भविष्य घडवप"
+}
+</file>
+
+<file path="src/i18n/locales/ta.json">
+{
+  "Home": "முகப்பு",
+  "Dashboard": "டேஷ்போர்டு",
+  "Children": "குழந்தைகள்",
+  "Education": "கல்வி",
+  "Health": "ஆரோக்கியம்",
+  "Resources": "வளங்கள்",
+  "Donors": "தானியாளர்",
+  "Scholarships": "விசாரணைகள்",
+  "Mentorship": "பராமரிப்பு",
+  "Impact": "பாதிப்பு வரைபடம்",
+  "Vault": "ச্মृति கொள்கை",
+  "ImpactShowcase": "பாதிப்பு காட்சி",
+  "RoleSelectTitle": "உங்கள் பாத்திரத்தை தேர்வு செய்யவும்",
+  "AdminPortal": "அணையாளர் போர்டல்",
+  "StudentPortal": "மாணவர் போர்டல்",
+  "DonorPortal": "தானியாளர் போர்டல்",
+  "SelectRole": "தொடரவும் ஒரு பாத்திரத்தை தேர்வு செய்யவும்",
+  "Language": "மொழி",
+  "WelcomeBackAdmin": "திரும்ப வரவேற்கிறோம், நிர்வாகி",
+  "OverviewLine": "குழந்தை நலத்திட்டங்களின் மேலோட்டம்",
+  "KeepLearning": "தொடர்ந்து கற்றுக்கொள்ளுங்கள், உங்கள் பயணம் முக்கியம்",
+  "ThankYouDonate": "உங்கள் ஆதரவிற்கு நன்றி",
+  "EmpoweringTitle": "ஒவ்வொரு குழந்தையையும் பிரபலமாக்குதல், பிரகாசமான எதிர்காலத்தை கட்டமைத்தல்"
+}
+</file>
+
+<file path="src/i18n/locales/te.json">
+{
+  "Home": "హోమ్",
+  "Dashboard": "డ్యాష్బోర్డ్",
+  "Children": "పిల్లలు",
+  "Education": "విద్య",
+  "Health": "ఆరోగ్యము",
+  "Resources": "వనరులు",
+  "Donors": "దాతలు",
+  "Scholarships": "విద్యా అనుదానం",
+  "Mentorship": "మెంటార్షిప్",
+  "Impact": "ప్రభావ మ్యాప్",
+  "Vault": "స్మృతి గది",
+  "ImpactShowcase": "ప్రభావ ప్రదర్శన",
+  "RoleSelectTitle": "మీ పాత్రను ఎంచుకోండి",
+  "AdminPortal": "అడ్మిన్ పోర్టల్",
+  "StudentPortal": "స్టూడెంట్ పోర్టల్",
+  "DonorPortal": "దాత పోర్టల్",
+  "SelectRole": "కొనసాగడానికి పాత్రను ఎన్నుకోండి",
+  "Language": "భాష",
+  "WelcomeBackAdmin": "మళ్ళీ స్వాగతం, నిర్వాహకుడు",
+  "OverviewLine": "బాల సంక్షేమ కార్యకలాపాల అవలోకనం",
+  "KeepLearning": "కొంత నేల నేర్చుకో, నీ ప్రయాణానికి విలువ ఉంది",
+  "ThankYouDonate": "మీ మద్దతుకు ధన్యవాదాలు",
+  "EmpoweringTitle": "ప్రతి పిల్లవాడిని శక్తివంతం చేయడం, ప్రకాశవంతమైన భవిష్యత్తును నిర్మించడం"
+}
+</file>
+
+<file path="src/i18n/en.json">
+{
+  "Home": "Home",
+  "Dashboard": "Dashboard",
+  "Children": "Children",
+  "Education": "Education",
+  "Health": "Health",
+  "Resources": "Resources",
+  "Donors": "Donors",
+  "Scholarships": "Scholarships",
+  "Mentorship": "Mentorship",
+  "Impact": "Impact Map",
+  "Vault": "Memory Vault",
+  "ImpactShowcase": "Impact Showcase",
+  "RoleSelectTitle": "Choose your role",
+  "AdminPortal": "Admin Portal",
+  "StudentPortal": "Student Portal",
+  "DonorPortal": "Donor Portal",
+  "SelectRole": "Select a role to continue",
+  "Language": "Language",
+  "WelcomeBackAdmin": "Welcome back, Administrator",
+  "OverviewLine": "Overview of child welfare operations",
+  "KeepLearning": "Keep learning, your journey matters",
+  "ThankYouDonate": "Thank you for your support",
+  "EmpoweringTitle": "Empowering every child, building brighter futures"
+}
+</file>
+
+<file path="src/i18n/hi.json">
+{
+  "Home": "मुख पृष्ठ",
+  "Dashboard": "डैशबोर्ड",
+  "Children": "बच्चे",
+  "Education": "शिक्षा",
+  "Health": "स्वास्थ्य",
+  "Resources": "संसाधन",
+  "Donors": "दाता",
+  "Scholarships": "छात्रवृत्ति",
+  "Mentorship": "मार्गदर्शन",
+  "Impact": "प्रभाव मानचित्र",
+  "Vault": "स्मृति भंडार",
+  "ImpactShowcase": "प्रभाव प्रदर्शन",
+  "RoleSelectTitle": "अपना रोल चुनें",
+  "AdminPortal": "प्रशासन पोर्टल",
+  "StudentPortal": "छात्र पोर्टल",
+  "DonorPortal": "दाता पोर्टल",
+  "SelectRole": "जारी रखने के लिए रोल चुनें",
+  "Language": "भाषा",
+  "WelcomeBackAdmin": "वापसी पर स्वागत है, व्यवस्थापक",
+  "OverviewLine": "बाल कल्याण संचालन का अवलोकन",
+  "KeepLearning": "सीखते रहो, तुम्हारी यात्रा मायने रखती है",
+  "ThankYouDonate": "आपके समर्थन के लिए धन्यवाद",
+  "EmpoweringTitle": "हर बच्चे को सशक्त बनाना, उज्जवल भविष्य का निर्माण"
+}
+</file>
+
+<file path="src/i18n/i18n.ts">
+import i18n from 'i18next'
+import { initReactI18next } from 'react-i18next'
+import en from './locales/en.json'
+import hi from './locales/hi.json'
+import kn from './locales/kn.json'
+import te from './locales/te.json'
+import ta from './locales/ta.json'
+import kok from './locales/kok.json'
+
+const resources = { en: {translation: en}, hi: {translation: hi}, kn: {translation: kn}, te: {translation: te}, ta: {translation: ta}, kok: {translation: kok} }
+
+const saved = localStorage.getItem('sahaaya:lang') || 'en'
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources,
+    lng: saved,
+    fallbackLng: 'en',
+    interpolation: { escapeValue: false },
+    react: { useSuspense: false }
+  })
+
+export default i18n
+</file>
+
+<file path="src/i18n/kn.json">
+{
+  "Home": "ಮುಖಪುಟ",
+  "Dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+  "Children": "ಮಕ್ಕಳು",
+  "Education": "ಶಿಕ್ಷಣ",
+  "Health": "ಆರೋಗ್ಯ",
+  "Resources": "ಸಂಪನ್ಮೂಲಗಳು",
+  "Donors": "ದಾನಿಗಳು",
+  "Scholarships": "ವಿದ್ಯಾ ಸಹಾಯ",
+  "Mentorship": "ಮೆಂಟರ್ಷಿಪ್",
+  "Impact": "ಪ್ರಭಾವ ನಕ್ಷೆ",
+  "Vault": "ಸ್ಮృతి ಗಾಯ",
+  "ImpactShowcase": "ಪ್ರಭಾವ ಪ್ರದರ್ಶನ",
+  "RoleSelectTitle": "ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆರಿಸಿ",
+  "AdminPortal": "ಆಡಳಿತ ಪೋರ್ಟಲ್",
+  "StudentPortal": "ವಿದ್ಯಾರ್ಥಿ ಪೋರ್ಟಲ್",
+  "DonorPortal": "ದಾನಿದಾರರ ಪೋರ್ಟಲ್",
+  "SelectRole": "ಮುಂದುವರಿಸಲು ಪಾತ್ರವನ್ನು ಆರಿಸಿ",
+  "Language": "ಭಾಷೆ",
+  "WelcomeBackAdmin": "ಮುಂದಿನ ಬಾರಿಗೆ ಸ್ವಾಗತ, ನಿರ್ವಾಹಕ",
+  "OverviewLine": "ಮಕ್ಕಳ ಕಲ್ಯಾಣ ಕಾರ್ಯಚಟುವಟಿಕೆಗಳ ಅವಲೋಕನ",
+  "KeepLearning": "ಕೆಲಸಮಾಡೋ, ನಿನ್ನ ಯಾತ್ರೆ ಮಹತ್ವವುಳ್ಳದು",
+  "ThankYouDonate": "ನಿಮ್ಮ ಬೆಂಬಲಕ್ಕೆ ಧನ್ಯವಾದಗಳು",
+  "EmpoweringTitle": "ಪ್ರತಿ ಮಕ್ಕಳೂ ಹಿಡಿತ ಪಡೆಯಲಿ, ಬೆಳಗಿನ ಭವಿಷ್ಯ ನಿರ್ಮಿಸೋಣ"
+}
+</file>
+
+<file path="src/i18n/translations.ts">
+const translations: Record<string, Record<string, string>> = {
+  en: {
+    Home: 'Home',
+    Dashboard: 'Dashboard',
+    Children: 'Children',
+    Education: 'Education',
+    Health: 'Health',
+    Resources: 'Resources',
+    Donors: 'Donors',
+    Scholarships: 'Scholarships',
+    Mentorship: 'Mentorship',
+    Impact: 'Impact Map',
+    Vault: 'Memory Vault',
+    ImpactShowcase: 'Impact Showcase',
+    RoleSelectTitle: 'Choose your role',
+    AdminPortal: 'Admin Portal',
+    StudentPortal: 'Student Portal',
+    DonorPortal: 'Donor Portal',
+    SelectRole: 'Select a role to continue',
+    Language: 'Language'
+  },
+  kn: {
+    Home: 'ಮುಖಪುಟ',
+    Dashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+    Children: 'ಮಕ್ಕಳು',
+    Education: 'ಶಿಕ್ಷಣ',
+    Health: 'ಆರೋಗ್ಯ',
+    Resources: 'ಸಂಪನ್ಮೂಲಗಳು',
+    Donors: 'ದಾನಿಗಳು',
+    Scholarships: 'ವಿದ್ಯಾ ಸಹಾಯ',
+    Mentorship: 'ಮೆಂಟರ್ಷಿಪ್',
+    Impact: 'ಪ್ರಭಾವ ನಕ್ಷೆ',
+    Vault: 'ಸ್ಮೃತಿ ಗಾಯ',
+    ImpactShowcase: 'ಪ್ರಭಾವ ಪ್ರದರ್ಶನ',
+    RoleSelectTitle: 'ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆರಿಸಿ',
+    AdminPortal: 'ಆಡಳಿತ ಪೋರ್ಟಲ್',
+    StudentPortal: 'ವಿದ್ಯಾರ್ಥಿ ಪೋರ್ಟಲ್',
+    DonorPortal: 'ದಿನದಾರಪೋರ್ಟಲ್',
+    SelectRole: 'ಮುಂದುವರಿಸಲು ಪಾತ್ರವನ್ನು ಆರಿಸಿ',
+    Language: 'ಭಾಷೆ'
+  },
+  hi: {
+    Home: 'मुख पृष्ठ',
+    Dashboard: 'डैशबोर्ड',
+    Children: 'बच्चे',
+    Education: 'शिक्षा',
+    Health: 'स्वास्थ्य',
+    Resources: 'संसाधन',
+    Donors: 'दाता',
+    Scholarships: 'छात्रवृत्ति',
+    Mentorship: 'मार्गदर्शन',
+    Impact: 'प्रभाव मानचित्र',
+    Vault: 'स्मृति भंडार',
+    ImpactShowcase: 'प्रभाव प्रदर्शन',
+    RoleSelectTitle: 'अपना रोल चुनें',
+    AdminPortal: 'प्रशासन पोर्टल',
+    StudentPortal: 'छात्र पोर्टल',
+    DonorPortal: 'दाता पोर्टल',
+    SelectRole: 'जारी रखने के लिए रोल चुनें',
+    Language: 'भाषा'
+  },
+  te: {
+    Home: 'హోమ్',
+    Dashboard: 'డ్యాష్బోర్డ్',
+    Children: 'పిల్లలు',
+    Education: 'విద్య',
+    Health: 'ఆరోగ్యము',
+    Resources: 'వనరులు',
+    Donors: 'దాతలు',
+    Scholarships: 'విద్యా అనुदానం',
+    Mentorship: 'మెంటార్షిప్',
+    Impact: 'ప్రभाव మ్యాప్',
+    Vault: 'స్మృతి గది',
+    ImpactShowcase: 'ప్రభావ ప్రదర్శన',
+    RoleSelectTitle: 'మీ పాత్రను ఎంచుకోండి',
+    AdminPortal: 'అడ్మిన్ పోర్టల్',
+    StudentPortal: 'స్టూడెంట్ పోర్టల్',
+    DonorPortal: 'దాత పోర్టల్',
+    SelectRole: 'కొనసాగడానికి పాత్రను ఎన్నుకోండి',
+    Language: 'భాష'
+  },
+  ta: {
+    Home: 'முகப்பு',
+    Dashboard: 'டேஷ்போர்டு',
+    Children: 'குழந்தைகள்',
+    Education: 'கல்வி',
+    Health: 'ஆரோக்கியம்',
+    Resources: 'வளங்கள்',
+    Donors: 'பெறுநர்கள்',
+    Scholarships: 'பள்ளி உதவி',
+    Mentorship: 'முன்னோக்கிச் சிகிச்சை',
+    Impact: 'பாதிப்பு வரைபடம்',
+    Vault: 'மூல பொருள்',
+    ImpactShowcase: 'பாதிப்பு முன்னணி',
+    RoleSelectTitle: 'உங்கள் பங்கு தேர்ந்தெடுக்கவும்',
+    AdminPortal: 'நிர்வாகி போர்டல்',
+    StudentPortal: 'மாணவர் போர்டல்',
+    DonorPortal: 'தானியளிப்பாளர் போர்டல்',
+    SelectRole: 'தொடர நிலைக்கு ஒரு பங்கை தேர்வு செய்யவும்',
+    Language: 'மொழி'
+  },
+  kok: {
+    Home: 'घरे',
+    Dashboard: 'डॅशबोर्ड',
+    Children: 'बाळा',
+    Education: 'शिक्षण',
+    Health: 'आरोग्य',
+    Resources: 'स्रोत',
+    Donors: 'दानदार',
+    Scholarships: 'छात्रवृत्ती',
+    Mentorship: 'मार्गदर्शन',
+    Impact: 'परिणाम नकाशा',
+    Vault: 'स्मृती पेटी',
+    ImpactShowcase: 'परिणाम प्रदर्शित',
+    RoleSelectTitle: 'तुमचें रोल निवडा',
+    AdminPortal: 'प्रशासक पोर्टल',
+    StudentPortal: 'विद्यार्थी पोर्टल',
+    DonorPortal: 'दानदार पोर्टल',
+    SelectRole: 'सुरू करपाक रोल निवडा',
+    Language: 'भाषा'
+  }
+}
+
+export default translations
+</file>
+
+<file path="src/i18n/useTranslation.tsx">
+import { useTranslation as useI18next } from 'react-i18next'
+import i18n from './i18n'
+
+export const LangProvider: React.FC<{children:React.ReactNode}> = ({children})=>{
+  return <>{children}</>
+}
+
+export const useTranslation = ()=>{
+  const { t, i18n: ix } = useI18next()
+  return { t, lang: ix.language, setLang: (l:string)=>{ ix.changeLanguage(l); localStorage.setItem('sahaaya:lang', l) } }
+}
+</file>
+
+<file path="src/modules/AlumniMuseum.tsx">
+import React, { useState } from 'react'
+import alumni from '../data/alumni.json'
+import { motion } from 'framer-motion'
+
+export default function AlumniMuseum(){
+  const [open, setOpen] = useState<any>(null)
+
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>Alumni Success Museum</h3>
+      <p className="text-sm" style={{color:'#7a5a44'}}>A curated gallery of framed success stories and career journeys.</p>
+
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {alumni.map((a:any)=>(
+          <motion.figure whileHover={{scale:1.03}} key={a.id} className="glass-card p-3 rounded-lg paper-edge" onClick={()=>setOpen(a)} style={{cursor:'pointer'}}>
+            <div className="border-4 border-[#efe0c8] p-1">
+              <img src={a.photo} className="w-full h-44 object-cover" />
+            </div>
+            <div className="mt-3 handwritten font-semibold" style={{color:'#4b3628'}}>{a.name}</div>
+            <div className="text-sm" style={{color:'#6b4c3b'}}>{a.title}</div>
+          </motion.figure>
+        ))}
+      </div>
+
+      {open && (
+        <motion.div initial={{scale:0.95,opacity:0}} animate={{scale:1,opacity:1}} className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-3xl p-6 glass-card rounded-xl shadow-2xl">
+          <div className="flex gap-6">
+            <img src={open.photo} className="w-40 h-40 object-cover border-4 border-[#efe0c8]" />
+            <div>
+              <div className="handwritten text-2xl" style={{color:'#6b4c3b'}}>{open.name}</div>
+              <div className="text-sm mt-2" style={{color:'#4b3628'}}>{open.story}</div>
+              <div className="mt-3 text-sm" style={{color:'#5a4433'}}>
+                <div className="font-semibold">Achievements</div>
+                <ul className="mt-1">
+                  {open.achievements.map((ach:string)=> <li key={ach}>• {ach}</li>)}
+                </ul>
+              </div>
+              <div className="mt-3 text-sm" style={{color:'#5a4433'}}>
+                <div className="font-semibold">Career Timeline</div>
+                <ul className="mt-1">
+                  {open.timeline.map((t:any)=> <li key={t.year}>{t.year} — {t.note}</li>)}
+                </ul>
+              </div>
+              <div className="mt-4"><button className="btn-primary" onClick={()=>setOpen(null)}>Close</button></div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/ChildGrowthTree.tsx">
+import React, { useEffect, useState } from 'react'
+import treeData from '../data/tree.json'
+import { motion } from 'framer-motion'
+
+type NodeItem = { id:string; label:string; branchId?:string }
+
+export default function ChildGrowthTree(){
+  const [selected, setSelected] = useState<any>(null)
+  const [grown, setGrown] = useState(false)
+
+  useEffect(()=>{
+    const t = setTimeout(()=> setGrown(true), 600)
+    return ()=>clearTimeout(t)
+  },[])
+
+  const handleClick = (item:any)=> setSelected(item)
+
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>{treeData.name}'s Growth Tree</h3>
+          <p className="text-sm" style={{color:'#7a5a44'}}>Roots are admissions, branches are skill areas, leaves are achievements.</p>
+        </div>
+        <div className="text-sm" style={{color:'#4b3628'}}>Grown: {grown ? 'Yes' : 'Growing...'}</div>
+      </div>
+
+      <div className="mt-6 relative">
+        <svg viewBox="0 0 800 400" className="w-full h-80">
+          {/* roots */}
+          <motion.line x1="100" y1="380" x2="240" y2="320" stroke="#8b6a52" strokeWidth={4}
+            initial={{pathLength:0}} animate={{pathLength: grown?1:0}} transition={{duration:1}}/>
+
+          {/* trunk */}
+          <motion.line x1="240" y1="320" x2="240" y2="220" stroke="#7a5238" strokeWidth={8}
+            initial={{pathLength:0}} animate={{pathLength: grown?1:0}} transition={{duration:1.2}}/>
+
+          {/* branches */}
+          {treeData.branches.map((b:any, i:number)=>{
+            const x = 240 + (i-1)*120
+            const y = 220 - (i%2===0?40:80)
+            return (
+              <g key={b.id}>
+                <motion.line x1="240" y1="220" x2={x} y2={y} stroke="#7a5238" strokeWidth={4}
+                  initial={{pathLength:0}} animate={{pathLength: grown?1:0}} transition={{duration:1.2, delay:0.2*i}} onClick={()=>handleClick(b)} style={{cursor:'pointer'}}/>
+                <motion.circle cx={x} cy={y} r={12} fill="#6b4c3b" whileHover={{scale:1.05}} onClick={()=>handleClick(b)} style={{cursor:'pointer'}}/>
+                <text x={x+18} y={y+6} fontFamily="Patrick Hand, cursive" fontSize={14} fill="#4b3628">{b.label}</text>
+              </g>
+            )
+          })}
+
+          {/* leaves */}
+          {treeData.leaves.map((l:any, idx:number)=>{
+            const branchIndex = treeData.branches.findIndex((b:any)=>b.id===l.branchId)
+            const x = 240 + (branchIndex-1)*120 + 30
+            const y = 220 - (branchIndex%2===0?40:80) - 20 - idx*12
+            return (
+              <motion.ellipse key={l.id} cx={x} cy={y} rx={18} ry={10} fill="#2f6b4a" initial={{scale:0,opacity:0}} animate={{scale: grown?1:0, opacity: grown?1:0}} transition={{delay:0.6+idx*0.1}} onClick={()=>handleClick(l)} style={{cursor:'pointer'}}/>
+            )
+          })}
+
+          {/* flowers */}
+          {treeData.flowers.map((f:any, i:number)=> (
+            <motion.g key={f.id} initial={{scale:0,opacity:0}} animate={{scale: grown?1:0, opacity: grown?1:0}} transition={{delay:0.8+i*0.15}} onClick={()=>handleClick(f)} style={{cursor:'pointer'}}>
+              <circle cx={520} cy={120} r={10} fill="#e7b36a" />
+              <text x={540} y={124} fontFamily="Patrick Hand, cursive" fontSize={13} fill="#4b3628">{f.label}</text>
+            </motion.g>
+          ))}
+
+          {/* fruits */}
+          {treeData.fruits.map((fr:any,i:number)=> (
+            <motion.g key={fr.id} initial={{y:60,opacity:0}} animate={{y:0,opacity: grown?1:0}} transition={{delay:1+i*0.12}} onClick={()=>handleClick(fr)} style={{cursor:'pointer'}}>
+              <circle cx={160 + i*40} cy={260} r={8} fill="#c97b4a" />
+              <text x={180 + i*40} y={264} fontFamily="Patrick Hand, cursive" fontSize={12} fill="#4b3628">{fr.label}</text>
+            </motion.g>
+          ))}
+        </svg>
+
+        {selected && (
+          <div className="absolute right-6 top-8 w-80 glass-card p-4 rounded-xl shadow-lg">
+            <div className="handwritten font-semibold" style={{color:'#6b4c3b'}}>{selected.label || selected.name}</div>
+            <div className="text-sm mt-2" style={{color:'#5a4433'}}>Details about this item. Click elsewhere to close.</div>
+            <button className="mt-3 btn-primary" onClick={()=>setSelected(null)}>Close</button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/DreamBuilder.tsx">
+import React, { useState } from 'react'
+import goalsData from '../data/dreams.json'
+
+export default function DreamBuilder(){
+  const [selected, setSelected] = useState<string | null>(null)
+
+  const completed = goalsData.completedSkills
+
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>Dream Builder</h3>
+      <p className="text-sm" style={{color:'#7a5a44'}}>Select a dream and see the roadmap of skills and mentors.</p>
+
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {goalsData.goals.map((g:any)=>{
+          const required = g.skills.length
+          const done = g.skills.filter((s:string)=> completed.includes(s)).length
+          const pct = Math.round((done/required)*100)
+          return (
+            <div key={g.id} className="p-4 glass-card rounded-xl paper-edge">
+              <div className="flex justify-between items-center">
+                <div className="handwritten font-semibold" style={{color:'#4b3628'}}>{g.title}</div>
+                <button className="text-sm" onClick={()=>setSelected(g.id)}>Open</button>
+              </div>
+              <div className="mt-2 text-xs" style={{color:'#6b4c3b'}}>Progress: {pct}%</div>
+              <div className="w-full bg-[#fff8ef] h-2 rounded mt-2 overflow-hidden" style={{border:'1px solid rgba(75,54,40,0.06)'}}>
+                <div style={{width:`${pct}%`, height:'100%', background:'#c69b6d'}} />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {selected && (
+        <div className="mt-4 p-4 glass-card rounded-xl">
+          <button className="text-sm" onClick={()=>setSelected(null)}>Close</button>
+          <div className="handwritten font-semibold">{goalsData.goals.find((g:any)=>g.id===selected)?.title}</div>
+          <div className="text-sm mt-2">Required Skills:</div>
+          <ul className="text-sm mt-1" style={{color:'#5a4433'}}>
+            {goalsData.goals.find((g:any)=>g.id===selected)?.skills.map((s:string)=>(<li key={s}>• {s}</li>))}
+          </ul>
+          <div className="text-sm mt-2">Suggested Mentor: {goalsData.goals.find((g:any)=>g.id===selected)?.mentors[0]}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/ImpactMap.tsx">
+import React, { useState } from 'react'
+import locations from '../data/locations.json'
+import { motion } from 'framer-motion'
+
+function Pin({item, onHover}:{item:any,onHover:(i:any)=>void}){
+  return (
+    <motion.div initial={{scale:0.6,opacity:0}} animate={{scale:1,opacity:1}} whileHover={{scale:1.1}} className="absolute" style={{left:`${item.x}%`, top:`${item.y}%`, translate:'-50% -50%'}} onMouseEnter={()=>onHover(item)}>
+      <div className="w-3 h-3 rounded-full bg-[#6b4c3b] shadow" />
+    </motion.div>
+  )
+}
+
+export default function ImpactMap(){
+  const [hovered, setHovered] = useState<any>(null)
+
+  const all = [...locations.orphanages, ...locations.donors, ...locations.alumni, ...locations.mentors]
+
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge relative overflow-hidden">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>India Impact Map</h3>
+          <p className="text-sm" style={{color:'#7a5a44'}}>Vintage explorer map showing our network across India.</p>
+        </div>
+        <div className="text-sm" style={{color:'#4b3628'}}>Connections: {all.length}</div>
+      </div>
+
+      <div className="mt-4 flex gap-6">
+        <div className="w-2/3 relative bg-[url('https://upload.wikimedia.org/wikipedia/commons/1/17/India_location_map.svg')] bg-contain bg-no-repeat bg-center rounded-xl" style={{height:360}}>
+          {/* render pins */}
+          {all.map((it:any)=> <Pin key={it.id} item={it} onHover={setHovered} />)}
+
+          {/* animated connection lines to center */}
+          {all.map((it:any, idx:number)=> (
+            <svg key={it.id} className="absolute left-0 top-0 w-full h-full pointer-events-none">
+              <motion.line x1={`${locations.center.x}%`} y1={`${locations.center.y}%`} x2={`${it.x}%`} y2={`${it.y}%`} stroke="#8b6a52" strokeWidth={1} initial={{pathLength:0}} animate={{pathLength:1}} transition={{delay:0.05*idx}} strokeOpacity={0.6} />
+            </svg>
+          ))}
+        </div>
+
+        <div className="w-1/3 space-y-3">
+          <div className="glass-card p-3 rounded-lg">
+            <div className="handwritten font-semibold" style={{color:'#6b4c3b'}}>Statistics</div>
+            <div className="mt-2 text-sm" style={{color:'#5a4433'}}>Orphanages: {locations.orphanages.length}</div>
+            <div className="text-sm" style={{color:'#5a4433'}}>Donors: {locations.donors.length}</div>
+            <div className="text-sm" style={{color:'#5a4433'}}>Alumni: {locations.alumni.length}</div>
+            <div className="text-sm" style={{color:'#5a4433'}}>Mentors: {locations.mentors.length}</div>
+          </div>
+
+          <div className="glass-card p-3 rounded-lg">
+            <div className="handwritten font-semibold" style={{color:'#6b4c3b'}}>Hovered</div>
+            {hovered ? (
+              <div className="mt-2 text-sm" style={{color:'#5a4433'}}>
+                <div className="font-semibold">{hovered.name}</div>
+                <div>{hovered.city}</div>
+                <div className="text-xs mt-1">{hovered.info}</div>
+              </div>
+            ) : (
+              <div className="mt-2 text-sm" style={{color:'#5a4433'}}>Hover a pin to see details.</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/LegacyDashboard.tsx">
+import React from 'react'
+
+export default function LegacyDashboard(){
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <h3 className="handwritten" style={{color:'#6b4c3b'}}>Legacy Dashboard</h3>
+      <ul className="mt-3 text-sm" style={{color:'#4b3628'}}>
+        <li>• Lives Changed: 1,240</li>
+        <li>• Dreams Achieved: 860</li>
+        <li>• Scholarships Earned: 320</li>
+      </ul>
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/LifeTimeline.tsx">
+import React, { useState } from 'react'
+import events from '../data/timeline.json'
+import { motion } from 'framer-motion'
+
+export default function LifeTimeline(){
+  const [active, setActive] = useState<string | null>(null)
+
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>Life Journey Timeline</h3>
+      <p className="text-sm" style={{color:'#7a5a44'}}>Turn the pages of a life story — photos, awards and handwritten notes.</p>
+
+      <div className="mt-6 overflow-x-auto py-4">
+        <div className="flex gap-6 px-4">
+          {events.map(ev=> (
+            <motion.article key={ev.id} className="polaroid w-56 p-3" whileHover={{scale:1.03}} onClick={()=>setActive(ev.id)}>
+              <img src={ev.photo} alt={ev.title} className="w-full h-36 object-cover rounded" />
+              <div className="mt-2 handwritten font-semibold" style={{color:'#4b3628'}}>{ev.title} — {ev.year}</div>
+              <div className="text-xs mt-1" style={{color:'#6b4c3b'}}>{ev.notes}</div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+
+      {active && (
+        <motion.div initial={{opacity:0, rotateY:-20}} animate={{opacity:1, rotateY:0}} className="mt-4 p-4 glass-card rounded-xl">
+          <button className="text-sm mb-2" onClick={()=>setActive(null)}>Close</button>
+          <div className="handwritten font-semibold">{events.find(e=>e.id===active)?.title}</div>
+          <div className="text-sm mt-1">{events.find(e=>e.id===active)?.notes}</div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/MemoryVault.tsx">
+import React, { useState } from 'react'
+import vault from '../data/vault.json'
+import { motion } from 'framer-motion'
+
+export default function MemoryVault(){
+  const [filter, setFilter] = useState<string>('all')
+  const [open, setOpen] = useState<any>(null)
+
+  const items = vault.items.filter((it:any)=> filter==='all' ? true : it.type===filter)
+
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>Memory Vault</h3>
+      <p className="text-sm" style={{color:'#7a5a44'}}>A curated scrapbook archive with search and flipbook viewing.</p>
+
+      <div className="mt-4 flex gap-3">
+        <button className="px-3 py-1 rounded" onClick={()=>setFilter('all')}>All</button>
+        <button className="px-3 py-1 rounded" onClick={()=>setFilter('photo')}>Photos</button>
+        <button className="px-3 py-1 rounded" onClick={()=>setFilter('certificate')}>Certificates</button>
+        <button className="px-3 py-1 rounded" onClick={()=>setFilter('drawing')}>Drawings</button>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {items.map((it:any)=>(
+          <motion.div key={it.id} className="polaroid p-2" whileHover={{scale:1.03}} onClick={()=>setOpen(it)} style={{cursor:'pointer'}}>
+            <img src={it.src} alt={it.title} className="w-full h-40 object-cover rounded" />
+            <div className="mt-2 handwritten" style={{color:'#4b3628'}}>{it.title}</div>
+            <div className="text-xs" style={{color:'#6b4c3b'}}>{it.type}</div>
+          </motion.div>
+        ))}
+      </div>
+
+      {open && (
+        <motion.div initial={{scale:0.95,opacity:0}} animate={{scale:1,opacity:1}} className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 max-w-3xl p-6 glass-card rounded-xl shadow-2xl">
+          <div className="flex gap-6">
+            <img src={open.src} className="w-60 h-60 object-cover border-4 border-[#efe0c8]" />
+            <div>
+              <div className="handwritten text-2xl" style={{color:'#6b4c3b'}}>{open.title}</div>
+              <div className="text-sm mt-2" style={{color:'#4b3628'}}>{open.desc}</div>
+              <div className="mt-4"><button className="btn-primary" onClick={()=>setOpen(null)}>Close</button></div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/MentorMarketplace.tsx">
+import React from 'react'
+
+export default function MentorMarketplace(){
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <h3 className="handwritten" style={{color:'#6b4c3b'}}>Mentor Marketplace</h3>
+      <p className="text-sm">Find volunteers and alumni mentors (placeholder).</p>
+      <div className="mt-4 h-48 flex items-center justify-center text-sm text-[#7a5a44]">[Mentor Matching]</div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/MessageWall.tsx">
+import React, { useState } from 'react'
+import messages from '../data/messages.json'
+import { motion } from 'framer-motion'
+
+function Postcard({msg, idx, onOpen}:{msg:any, idx:number, onOpen:(m:any)=>void}){
+  const rot = (Math.random()-0.5)*8
+  const left = 10 + idx*12
+  return (
+    <motion.div initial={{rotate:rot-8, y:20}} animate={{rotate:rot, y:0}} whileHover={{scale:1.03}} className="absolute w-56 p-3 bg-[#fffdf7] paper-edge rounded shadow-lg" style={{left:`${left}%`, top:`${(idx%5)*10 + 8}%`, transform:`rotate(${rot}deg)`}} onClick={()=>onOpen(msg)}>
+      <div className="handwritten font-semibold" style={{color:'#6b4c3b'}}>{msg.from}</div>
+      <div className="text-xs mt-1" style={{color:'#4b3628'}}>{msg.text}</div>
+      <div className="text-xxs mt-2 text-[#7a5a44]">{msg.role} • {msg.date}</div>
+    </motion.div>
+  )
+}
+
+export default function MessageWall(){
+  const [open, setOpen] = useState<any>(null)
+
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge relative" style={{minHeight:420}}>
+      <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>Message of Hope Wall</h3>
+      <p className="text-sm" style={{color:'#7a5a44'}}>A corkboard of postcards pinned with love and stories.</p>
+
+      <div className="mt-4 relative h-96 bg-[url('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1400&auto=format&fit=crop&ixlib=rb-4.0.3&s=')] bg-cover rounded">
+        {messages.map((m:any, i:number)=>(<Postcard key={m.id} msg={m} idx={i} onOpen={setOpen} />))}
+      </div>
+
+      {open && (
+        <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 p-6 glass-card rounded-xl shadow-2xl">
+          <div className="handwritten text-xl" style={{color:'#6b4c3b'}}>{open.from}</div>
+          <div className="text-sm mt-2" style={{color:'#4b3628'}}>{open.text}</div>
+          <div className="text-xs mt-3 text-[#7a5a44]">{open.role} • {open.date}</div>
+          <div className="mt-4"><button className="btn-primary" onClick={()=>setOpen(null)}>Close</button></div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="src/modules/WellnessRadar.tsx">
+import React from 'react'
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts'
+
+const data = [
+  {subject: 'Education', A: 85},
+  {subject: 'Health', A: 70},
+  {subject: 'Emotional', A: 78},
+  {subject: 'Social', A: 72},
+  {subject: 'Creativity', A: 88},
+  {subject: 'Leadership', A: 65}
+]
+
+export default function WellnessRadar(){
+  return (
+    <div className="glass-card p-6 rounded-2xl paper-edge">
+      <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>Wellness Radar</h3>
+      <p className="text-sm" style={{color:'#7a5a44'}}>Balanced view of educational, health and social development.</p>
+      <div className="mt-4 h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart cx="50%" cy="50%" outerRadius={100} data={data}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="subject" tick={{fontFamily:'Patrick Hand', fill:'#4b3628'}} />
+            <PolarRadiusAxis angle={30} domain={[0,100]} />
+            <Radar name="Score" dataKey="A" stroke="#2f6b4a" fill="#2f6b4a" fillOpacity={0.4} />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/admin/AdminHome.tsx">
+import React from 'react'
+import { useTranslation } from '../../i18n/useTranslation'
+import VintageIllustration from '../../components/VintageIllustration'
+import MetricCard from '../../components/MetricCard'
+import ProfileCard from '../../components/ProfileCard'
+import ProgressCard from '../../components/ProgressCard'
+import ActivityTimeline from '../../components/ActivityTimeline'
+import ImpactCard from '../../components/ImpactCard'
+import ChartCard from '../../components/ChartCard'
+import ChildCard from '../../components/ChildCard'
+
+export default function AdminHome(){
+  const { t } = useTranslation() as any
+  const metrics = { totalChildren:128, programs:12, donors:54, resources:342, scholarships:23 }
+  const activities = [
+    {time:'2h', title:'New admission: Aarav', desc:'Registered under education program'},
+    {time:'1d', title:'Donation received', desc:'₹50,000 via bank transfer'},
+    {time:'3d', title:'Health camp completed', desc:'Vaccinations and checkups for 45 children'}
+  ]
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+        <div className="lg:col-span-2">
+          <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>{t('WelcomeBackAdmin')}</h2>
+          <div className="text-sm" style={{color:'#4b3628'}}>{t('OverviewLine')}</div>
+        </div>
+        <div className="flex justify-end">
+          <ProfileCard name="Admin" role="Sahaaya Manager" />
+        </div>
+      </div>
+      <div className="mt-4">
+        <VintageIllustration variant="admin" title={t('EmpoweringTitle')} description={t('OverviewLine')} />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <MetricCard title="Total Children" value={metrics.totalChildren} />
+        <MetricCard title="Active Programs" value={metrics.programs} />
+        <MetricCard title="Donors Connected" value={metrics.donors} />
+        <MetricCard title="Resources Available" value={metrics.resources} />
+        <MetricCard title="Scholarships" value={metrics.scholarships} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <ChartCard title="Child Welfare Overview">
+          <div className="h-40 flex items-center justify-center text-slate-500">[Placeholder chart]</div>
+        </ChartCard>
+        <div className="space-y-4 lg:col-span-2">
+          <ProgressCard title="Education Progress" percent={72} />
+          <ActivityTimeline events={activities} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <ImpactCard title="Education" delta="+25%" />
+        <ImpactCard title="Health Records" delta="+30%" />
+        <ImpactCard title="Resource Efficiency" delta="+40%" />
+      </div>
+
+      <div>
+        <h3 className="handwritten text-lg" style={{color:'#6b4c3b'}}>Recent Children</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
+          <ChildCard name="Aarav" age={7} progress={45} />
+          <ChildCard name="Meera" age={10} progress={80} />
+          <ChildCard name="Rohan" age={9} progress={60} />
+          <ChildCard name="Anya" age={8} progress={70} />
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/donor/DonorHome.tsx">
+import React from 'react'
+import { useTranslation } from '../../i18n/useTranslation'
+import MetricCard from '../../components/MetricCard'
+import ChildCard from '../../components/ChildCard'
+import ChartCard from '../../components/ChartCard'
+import ActivityTimeline from '../../components/ActivityTimeline'
+import VintageIllustration from '../../components/VintageIllustration'
+
+export default function DonorHome(){
+  const { t } = useTranslation() as any
+
+  const activities = [
+    {time:'1mo', title:'School kits distributed', desc:'Provided to 30 children'},
+    {time:'2mo', title:'Scholarship awarded', desc:'3 students received STEM grants'}
+  ]
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+        <div className="lg:col-span-2">
+          <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>{t('ThankYouDonate')}</h2>
+          <div className="text-sm" style={{color:'#4b3628'}}>{t('OverviewLine')}</div>
+        </div>
+        <div className="flex justify-end">
+          <VintageIllustration variant="donor" title={t('ThankYouDonate')} description={t('EmpoweringTitle')} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <MetricCard title="Total Donations" value="$7,800" />
+        <MetricCard title="Children Impacted" value={92} />
+        <MetricCard title="Scholarships Supported" value={12} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <ChartCard title="Donation Trends"><div className="h-36 flex items-center justify-center text-slate-500">[Trend chart]</div></ChartCard>
+        <div className="lg:col-span-2">
+          <ActivityTimeline events={activities} />
+        </div>
+      </div>
+
+      <div>
+        <h3 className="handwritten text-lg" style={{color:'#6b4c3b'}}>Success Stories</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+          <ChildCard name="Ravi" age={14} progress={85} />
+          <ChildCard name="Sana" age={16} progress={92} />
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/student/StudentHome.tsx">
+import React from 'react'
+import { useTranslation } from '../../i18n/useTranslation'
+import ProfileCard from '../../components/ProfileCard'
+import ProgressCard from '../../components/ProgressCard'
+import ActivityTimeline from '../../components/ActivityTimeline'
+import ChildCard from '../../components/ChildCard'
+import ChartCard from '../../components/ChartCard'
+import VintageIllustration from '../../components/VintageIllustration'
+
+export default function StudentHome(){
+  const { t } = useTranslation() as any
+
+  const activities = [
+    {time:'Tomorrow', title:'Math Class', desc:'Practice times tables'},
+    {time:'Friday', title:'Library Hour', desc:'Read "The Little Prince"'},
+  ]
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+        <div className="lg:col-span-2">
+          <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>{t('KeepLearning')}</h2>
+          <div className="text-sm" style={{color:'#4b3628'}}>{t('OverviewLine')}</div>
+        </div>
+        <div className="flex justify-end">
+          <ProfileCard name="Meera" role="Student" />
+        </div>
+      </div>
+      <div className="mt-4">
+        <VintageIllustration variant="student" title={t('KeepLearning')} description={t('EmpoweringTitle')} />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <ProgressCard title="Learning Progress" percent={68} />
+        <ChartCard title="Recent Grades"><div className="h-28 flex items-center justify-center text-slate-500">[Grades chart]</div></ChartCard>
+        <div className="space-y-4">
+          <ChildCard name="Meera" age={10} progress={68} />
+          <ActivityTimeline events={activities} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <ChartCard title="Mentor Messages"> <div className="h-28">You have a new message from Ms. Iyer.</div></ChartCard>
+        <ChartCard title="Scholarship Status"> <div className="h-28">Eligible for Arts Fellowship</div></ChartCard>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/ChildManagement.tsx">
+import React from 'react'
+import childrenData from '../data/children.json'
+import Card from '../components/Card'
+
+export default function ChildManagement(){
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Stories & Memories</h2>
+        <div>
+          <button className="btn-primary handwritten">Add Memory</button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {childrenData.map(child => (
+          <Card key={child.id} className="p-4">
+            <div className="flex items-start gap-4">
+              <div className="w-20 h-20 overflow-hidden rounded-md paper-edge">
+                <img src={child.photo} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <div className="font-semibold handwritten" style={{color:'#4b3628'}}>{child.name} — {child.age}</div>
+                <div className="text-sm" style={{color:'#6b4c3b'}}>{child.education} • {child.health}</div>
+                <div className="text-xs mt-2" style={{color:'#7a5a44'}}>Tap to open scrapbook →</div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/Dashboard.tsx">
+import React from 'react'
+import Card from '../components/Card'
+import Metric from '../components/Metric'
+import ChartArea from '../components/ChartArea'
+import data from '../data/analytics.json'
+
+export default function Dashboard(){
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Legacy Dashboard</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card><Metric value={1240} label="Lives Changed"/></Card>
+        <Card><Metric value={860} label="Dreams Achieved"/></Card>
+        <Card><Metric value={320} label="Scholarships"/></Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-4">
+          <h3 className="handwritten" style={{color:'#4b3628'}}>Life Journey Timeline</h3>
+          <p className="text-sm">An interactive scrapbook timeline of milestones.</p>
+        </Card>
+        <ChartArea data={data.donationTrends} />
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/Donors.tsx">
+import React from 'react'
+import Card from '../components/Card'
+
+const donors = [
+  {id:'d1', name:'R. Sharma', total:1200},
+  {id:'d2', name:'Global Philanthropy', total:4200},
+  {id:'d3', name:'Friends of Sahaaya', total:2300}
+]
+
+export default function Donors(){
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Donor Transparency</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {donors.map(d=> (
+          <Card key={d.id} className="p-4">
+            <div className="handwritten font-semibold">{d.name}</div>
+            <div className="text-sm mt-2" style={{color:'#5a4433'}}>Total Given: ${d.total}</div>
+            <div className="text-xs mt-1">Sponsor: {d.name}</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/Education.tsx">
+import React from 'react'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import Card from '../components/Card'
+
+const data = [
+  {month:'Jan', score:65}, {month:'Feb', score:68}, {month:'Mar', score:70}, {month:'Apr', score:74}, {month:'May', score:78}, {month:'Jun', score:82}
+]
+
+export default function Education(){
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Education Tracking</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-4">
+          <div className="handwritten font-semibold">Attendance & Scores</div>
+          <div className="h-64 mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data}>
+                <XAxis dataKey="month" stroke="#7a5a44" />
+                <YAxis stroke="#7a5a44" />
+                <Tooltip />
+                <Line dataKey="score" stroke="#2f6b4a" strokeWidth={3} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="handwritten font-semibold">Courses & Certifications</div>
+          <ul className="mt-3 text-sm" style={{color:'#5a4433'}}>
+            <li>• Foundation Literacy Program — Completed</li>
+            <li>• Basic Computer Course — In Progress</li>
+            <li>• Mathematics Enrichment — Completed</li>
+          </ul>
+        </Card>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/Health.tsx">
+import React from 'react'
+import WellnessRadar from '../modules/WellnessRadar'
+import Card from '../components/Card'
+
+export default function Health(){
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Health & Wellness</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <WellnessRadar />
+        <Card className="p-4">
+          <div className="handwritten font-semibold">Medical Records</div>
+          <ul className="mt-3 text-sm" style={{color:'#5a4433'}}>
+            <li>• Last Checkup: 2025-03-12</li>
+            <li>• Vaccinations: Up-to-date</li>
+            <li>• Nutrition Status: Healthy</li>
+          </ul>
+        </Card>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/ImpactShowcase.tsx">
+import React from 'react'
+import { motion } from 'framer-motion'
+import Card from '../components/Card'
+
+export default function ImpactShowcase(){
+  return (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl handwritten" style={{color:'#6b4c3b'}}>Impact Showcase</h2>
+        <div className="handwritten">A living presentation of our impact</div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="p-6">
+          <div className="text-3xl font-bold handwritten" style={{color:'#6b4c3b'}}>1,240</div>
+          <div className="text-sm">Lives Transformed</div>
+        </Card>
+        <Card className="p-6">
+          <div className="text-3xl font-bold handwritten" style={{color:'#6b4c3b'}}>860</div>
+          <div className="text-sm">Dreams Achieved</div>
+        </Card>
+        <Card className="p-6">
+          <div className="text-3xl font-bold handwritten" style={{color:'#6b4c3b'}}>320</div>
+          <div className="text-sm">Scholarships Earned</div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="handwritten">Alumni Success Stories</h3>
+          <p className="text-sm">Selected success narratives for demos and donors.</p>
+        </Card>
+        <Card className="p-6">
+          <h3 className="handwritten">Donor Transparency</h3>
+          <p className="text-sm">Impact-focused reporting and resource allocation visualization.</p>
+        </Card>
+      </div>
+    </motion.div>
+  )
+}
+</file>
+
+<file path="src/pages/Landing.tsx">
+import React from 'react'
+import Card from '../components/Card'
+import Metric from '../components/Metric'
+import { motion } from 'framer-motion'
+
+export default function Landing(){
+  return (
+    <div className="space-y-8">
+      <section className="grid md:grid-cols-2 gap-6 items-center">
+        <div>
+          <h1 className="text-4xl md:text-5xl font-extrabold handwritten" style={{color:'#6b4c3b'}}>Every Child Deserves a Brighter Tomorrow</h1>
+          <p className="mt-4" style={{color:'#4b3628'}}>Sahaaya helps orphanages manage child welfare, education, health, resources, donations, and future opportunities through a transparent digital platform.</p>
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="p-4 glass-card rounded-xl">
+              <div className="handwritten text-xl" style={{color:'#6b4c3b'}}>Lives Supported</div>
+              <div className="text-2xl font-bold">1,240</div>
+            </div>
+            <div className="p-4 glass-card rounded-xl">
+              <div className="handwritten text-xl" style={{color:'#6b4c3b'}}>Active Donors</div>
+              <div className="text-2xl font-bold">860</div>
+            </div>
+            <div className="p-4 glass-card rounded-xl">
+              <div className="handwritten text-xl" style={{color:'#6b4c3b'}}>Scholarships Awarded</div>
+              <div className="text-2xl font-bold">320</div>
+            </div>
+            <div className="p-4 glass-card rounded-xl">
+              <div className="handwritten text-xl" style={{color:'#6b4c3b'}}>Resources Distributed</div>
+              <div className="text-2xl font-bold">4,500</div>
+            </div>
+          </div>
+          <div className="mt-6 flex gap-3">
+            <button className="btn-primary handwritten">Request Demo</button>
+            <button className="px-4 py-2 rounded-xl bg-[#fff8ef]" style={{border:'1px solid rgba(75,54,40,0.06)'}}>Explore Platform</button>
+          </div>
+        </div>
+        <div>
+          <Card>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="handwritten" style={{color:'#6b4c3b'}}>Lives Cherished</div>
+              <div className="text-sm" style={{color:'#5a4433'}}>A living archive of memories, milestones and handwritten notes.</div>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      <section className="grid md:grid-cols-3 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold handwritten">Life Timeline</h3>
+          <p className="mt-2">Interactive scrapbook timeline of major events and photos.</p>
+        </Card>
+        <Card className="p-6">
+          <h3 className="font-semibold handwritten">Child Growth Tree</h3>
+          <p className="mt-2">Visual tree of achievements and milestones.</p>
+        </Card>
+        <Card className="p-6">
+          <h3 className="font-semibold handwritten">Message of Hope Wall</h3>
+          <p className="mt-2">Postcards and notes from donors and mentors.</p>
+        </Card>
+      </section>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/Mentorship.tsx">
+import React from 'react'
+import Card from '../components/Card'
+
+const mentors = [
+  {id:'m1', name:'Dr. Kumar', sessions:24},
+  {id:'m2', name:'Ms. Iyer', sessions:18},
+  {id:'m3', name:'Eng. Rao', sessions:30}
+]
+
+export default function Mentorship(){
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Mentorship Network</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {mentors.map(mt=> (
+          <Card key={mt.id} className="p-4">
+            <div className="handwritten font-semibold">{mt.name}</div>
+            <div className="text-sm mt-2" style={{color:'#5a4433'}}>Sessions: {mt.sessions}</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/Resources.tsx">
+import React from 'react'
+import Card from '../components/Card'
+
+const inventory = [
+  {id:'r1', name:'Textbooks', stock:120, low:20},
+  {id:'r2', name:'Laptops', stock:12, low:3},
+  {id:'r3', name:'Uniforms', stock:80, low:15},
+  {id:'r4', name:'Medicines', stock:40, low:10}
+]
+
+export default function Resources(){
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Resource Management</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {inventory.map(it=> (
+          <Card key={it.id} className="p-4">
+            <div className="handwritten font-semibold">{it.name}</div>
+            <div className="text-sm mt-2" style={{color:'#5a4433'}}>Stock: {it.stock}</div>
+            <div className="text-xs mt-1">Low threshold: {it.low}</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/RoleSelector.tsx">
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from '../i18n/useTranslation'
+import { useRole } from '../contexts/RoleContext'
+import VintageIllustration from '../components/VintageIllustration'
+
+export default function RoleSelector(){
+  const nav = useNavigate()
+  const { t } = useTranslation() as any
+  const { setRole } = useRole()
+
+  const choose = (r:'admin'|'student'|'donor')=>{
+    setRole(r)
+    nav(`/${r}`)
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto text-center space-y-6 notebook">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+        <div>
+          <h1 className="text-3xl handwritten" style={{color:'#6b4c3b'}}>{t('RoleSelectTitle')}</h1>
+          <p className="text-sm" style={{color:'#4b3628'}}>{t('SelectRole')}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+            <button onClick={()=>choose('admin')} className="p-6 glass-card handwritten">{t('AdminPortal')}</button>
+            <button onClick={()=>choose('student')} className="p-6 glass-card handwritten">{t('StudentPortal')}</button>
+            <button onClick={()=>choose('donor')} className="p-6 glass-card handwritten">{t('DonorPortal')}</button>
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <VintageIllustration variant="landing" title={t('EmpoweringTitle')} description={t('SelectRole')} />
+        </div>
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/pages/Scholarships.tsx">
+import React from 'react'
+import Card from '../components/Card'
+
+const scholarships = [
+  {id:'s1', name:'Merit Scholarship', awarded:45},
+  {id:'s2', name:'STEM Grant', awarded:12},
+  {id:'s3', name:'Arts Fellowship', awarded:8}
+]
+
+export default function Scholarships(){
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Scholarships & Career Hub</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {scholarships.map(s=> (
+          <Card key={s.id} className="p-4">
+            <div className="handwritten font-semibold">{s.name}</div>
+            <div className="text-sm mt-2" style={{color:'#5a4433'}}>Awarded: {s.awarded}</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="src/App.tsx">
+import React, { useState } from 'react'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import Landing from './pages/Landing'
+import RoleSelector from './pages/RoleSelector'
+import AdminHome from './pages/admin/AdminHome'
+import StudentHome from './pages/student/StudentHome'
+import DonorHome from './pages/donor/DonorHome'
+import { RoleProvider } from './contexts/RoleContext'
+import RequireRole from './components/RequireRole'
+import Dashboard from './pages/Dashboard'
+import ChildManagement from './pages/ChildManagement'
+import ChildGrowthTree from './modules/ChildGrowthTree'
+import LifeTimeline from './modules/LifeTimeline'
+import DreamBuilder from './modules/DreamBuilder'
+import MentorMarketplace from './modules/MentorMarketplace'
+import MessageWall from './modules/MessageWall'
+import WellnessRadar from './modules/WellnessRadar'
+import AlumniMuseum from './modules/AlumniMuseum'
+import ImpactMap from './modules/ImpactMap'
+import LegacyDashboard from './modules/LegacyDashboard'
+import MemoryVault from './modules/MemoryVault'
+import Navbar from './components/Navbar'
+import Sidebar from './components/Sidebar'
+import ImpactShowcase from './pages/ImpactShowcase'
+import Education from './pages/Education'
+import Health from './pages/Health'
+import Resources from './pages/Resources'
+import Donors from './pages/Donors'
+import Scholarships from './pages/Scholarships'
+import Mentorship from './pages/Mentorship'
+
+export default function App(){
+  const [open, setOpen] = useState(false)
+  const location = useLocation()
+  return (
+    <RoleProvider>
+    <div className="min-h-screen">
+      <Navbar onMenu={() => setOpen(s => !s)} />
+      <div className="flex">
+        <Sidebar open={open} />
+        <main className="flex-1 p-6 notebook">
+          <AnimatePresence mode="wait">
+            <motion.div key={location.pathname} initial={{opacity:0, x:20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-20}} transition={{duration:0.4}}>
+              <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<RoleSelector/>} />
+                <Route path="/admin" element={<RequireRole allowed={[ 'admin' ]}><AdminHome/></RequireRole>} />
+                <Route path="/student" element={<RequireRole allowed={[ 'student' ]}><StudentHome/></RequireRole>} />
+                <Route path="/donor" element={<RequireRole allowed={[ 'donor' ]}><DonorHome/></RequireRole>} />
+                <Route path="/landing" element={<Landing/>} />
+                <Route path="/dashboard" element={<Dashboard/>} />
+                <Route path="/children" element={<ChildManagement/>} />
+                <Route path="/tree" element={<ChildGrowthTree/>} />
+                <Route path="/timeline" element={<LifeTimeline/>} />
+                <Route path="/dreams" element={<DreamBuilder/>} />
+                <Route path="/mentors" element={<MentorMarketplace/>} />
+                <Route path="/wall" element={<MessageWall/>} />
+                <Route path="/wellness" element={<WellnessRadar/>} />
+                <Route path="/museum" element={<AlumniMuseum/>} />
+                <Route path="/education" element={<Education/>} />
+                <Route path="/health" element={<Health/>} />
+                <Route path="/resources" element={<Resources/>} />
+                <Route path="/donors" element={<Donors/>} />
+                <Route path="/scholarships" element={<Scholarships/>} />
+                <Route path="/mentorship" element={<Mentorship/>} />
+                <Route path="/impact" element={<ImpactMap/>} />
+                <Route path="/vault" element={<MemoryVault/>} />
+                <Route path="/impact-showcase" element={<ImpactShowcase/>} />
+                <Route path="/legacy" element={<LegacyDashboard/>} />
+              </Routes>
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      </div>
+    </div>
+    </RoleProvider>
+  )
+}
+</file>
+
+<file path="src/main.tsx">
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import App from './App'
+import './i18n/i18n'
+import './styles.css'
+
+createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <React.Suspense>
+        <App />
+      </React.Suspense>
+    </BrowserRouter>
+  </React.StrictMode>
+)
+</file>
+
+<file path="src/styles.css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --paper: linear-gradient(180deg, #fbf6ef 0%, #f5ecdb 100%);
+}
+
+body{
+  font-family: 'Libre Baskerville', Georgia, serif;
+  @apply bg-cream text-ink min-h-screen;
+  background-image: var(--paper);
+}
+
+.glass-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(250,245,238,0.9));
+  box-shadow: 0 8px 24px rgba(11,8,6,0.12);
+  border: 1px solid rgba(107,76,59,0.08);
+}
+
+.polaroid{
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(16,12,8,0.15);
+  transform: rotate(-2deg);
+  border: 8px solid rgba(247,238,226,0.9);
+}
+
+.handwritten{
+  font-family: 'Patrick Hand', cursive;
+}
+
+.btn-primary{
+  background: linear-gradient(180deg,#c69b6d,#8c5a2b);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(107,76,59,0.18);
+}
+
+.rounded-xl-2{
+  border-radius: 18px;
+}
+
+.notebook{
+  background-image: linear-gradient(transparent 0 38px, rgba(0,0,0,0.02) 38px 39px);
+  background-size: 100% 39px;
+}
+
+.paper-edge{
+  box-shadow: inset 0 10px 30px rgba(0,0,0,0.03);
+}
+
+/* Floating paper fragments */
+.paper-fragment{position:absolute;pointer-events:none;opacity:0.08}
+
+/* Dust particle canvas placeholder */
+.dust-canvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:10}
+
+/* Vintage illustration container */
+.vintage-illustration{background:linear-gradient(180deg,#fffaf3,#fbf3e6);border:1px solid rgba(224,201,177,0.6);box-shadow:0 10px 30px rgba(11,8,6,0.06)}
+
+/* Decorative frames */
+.vintage-frame{border:1px dashed rgba(107,76,59,0.12);padding:12px;border-radius:12px;background:rgba(255,254,250,0.6)}
+
+/* Stamp / badge */
+.vintage-badge{background:#efe0d0;border-radius:999px;padding:6px 10px;border:1px solid rgba(107,76,59,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAHAAYA — Empowering Every Child Through Care, Education and Opportunity</title>
+    <meta name="description" content="Sahaaya - Empowering Every Child Through Care, Education and Opportunity" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+  </html>
+</file>
+
+<file path="package.json">
+{
+  "name": "sahaaya-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "framer-motion": "^10.12.16",
+    "lucide-react": "^0.268.0",
+    "i18next": "^23.0.1",
+    "react-i18next": "^13.0.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.14.1",
+    "recharts": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/node": "^20.6.0",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.30",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.0"
+  }
+}
+</file>
+
+<file path="postcss.config.cjs">
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {}
+  }
+}
+</file>
+
+<file path="README.md">
+# SAHAAYA — Digital Child Welfare Platform (Prototype)
+
+Empowering Every Child Through Care, Education and Opportunity
+
+This repository is a UI prototype for `SAHAAYA` — a digital child welfare and orphanage management platform built with React, TypeScript, Tailwind CSS, Framer Motion and Recharts.
+
+Quick start:
+
+```bash
+npm install
+npm run dev
+```
+
+Pages included:
+- Landing
+- Dashboard
+- Child management
+
+Notes:
+- This is a frontend prototype using mock JSON data under `src/data`.
+- Install dependencies and run the Vite dev server.
+</file>
+
+<file path="tailwind.config.cjs">
+module.exports = {
+  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"] ,
+  theme: {
+    extend: {
+      colors: {
+        cream: '#f7efe2',
+        parchment: '#efe0c8',
+        vintageBrown: '#6b4c3b',
+        forestGreen: '#2f6b4a',
+        ink: '#2b2b2b'
+      },
+      borderRadius: {
+        xl: '20px',
+        '2xl': '24px'
+      }
+    }
+  },
+  plugins: []
+}
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["node"]
+  },
+  "include": ["src"]
+}
+</file>
+
+<file path="vite.config.ts">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: { port: 5173 }
+})
+</file>
+
+</files>

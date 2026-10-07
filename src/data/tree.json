@@ -1,0 +1,17 @@
+{
+  "id":"c1",
+  "name":"Asha",
+  "roots": [{"label":"Admitted","year":2016}],
+  "branches": [
+    {"id":"b1","label":"Literacy","skills":["Reading","Writing"]},
+    {"id":"b2","label":"Art","skills":["Drawing","Crafts"]},
+    {"id":"b3","label":"Sports","skills":["Football","Running"]}
+  ],
+  "leaves": [
+    {"id":"l1","branchId":"b1","label":"Completed Grade 3"},
+    {"id":"l2","branchId":"b2","label":"Art Fair Winner"},
+    {"id":"l3","branchId":"b3","label":"Inter-school Match"}
+  ],
+  "flowers":[{"id":"f1","label":"Best Creative"}],
+  "fruits":[{"id":"fr1","label":"Reading Milestone"}]
+}

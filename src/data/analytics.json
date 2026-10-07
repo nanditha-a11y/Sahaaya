@@ -1,0 +1,15 @@
+{
+  "ageDistribution": [
+    {"name":"0-5","value":120},
+    {"name":"6-10","value":420},
+    {"name":"11-15","value":380},
+    {"name":"16+","value":320}
+  ],
+  "donationTrends": [
+    {"name":"Jan","value":1200},
+    {"name":"Feb","value":900},
+    {"name":"Mar","value":1500},
+    {"name":"Apr","value":1800},
+    {"name":"May","value":2100}
+  ]
+}

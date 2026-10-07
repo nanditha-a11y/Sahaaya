@@ -1,0 +1,10 @@
+{
+  "goals":[
+    {"id":"g1","title":"Doctor","skills":["Biology","Physics","Communication"],"mentors":["Dr. Kumar"]},
+    {"id":"g2","title":"Engineer","skills":["Math","Physics","Problem Solving"],"mentors":["Eng. Rao"]},
+    {"id":"g3","title":"Teacher","skills":["Subject Knowledge","Patience","Communication"],"mentors":["Ms. Iyer"]},
+    {"id":"g4","title":"Artist","skills":["Drawing","Creativity","Portfolio"],"mentors":["Artist Meena"]},
+    {"id":"g5","title":"Entrepreneur","skills":["Business","Leadership","Finance"],"mentors":["Mr. Shah"]}
+  ],
+  "completedSkills":["Reading","Drawing","Basic Math"]
+}

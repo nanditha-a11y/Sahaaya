@@ -1,0 +1,20 @@
+{
+  "center": { "x": 50, "y": 50 },
+  "orphanages": [
+    { "id": "o1", "name": "Hope Home Mumbai", "x": 72, "y": 68, "city":"Mumbai", "info":"Supports 120 children" },
+    { "id": "o2", "name": "Sunrise Kolkata", "x": 92, "y": 40, "city":"Kolkata", "info":"Education programs" },
+    { "id": "o3", "name": "Meera Care Chennai", "x": 85, "y": 78, "city":"Chennai", "info":"Health initiatives" }
+  ],
+  "donors": [
+    { "id":"d1","name":"R. Sharma","x":40,"y":30,"city":"Jaipur","info":"Monthly donor" },
+    { "id":"d2","name":"Global Philanthropy","x":20,"y":45,"city":"Delhi","info":"Major donor" }
+  ],
+  "alumni": [
+    { "id":"a1","name":"Neha","x":60,"y":55,"city":"Bengaluru","info":"Engineer at TechCorp" },
+    { "id":"a2","name":"Amit","x":30,"y":72,"city":"Pune","info":"School Teacher" }
+  ],
+  "mentors": [
+    { "id":"m1","name":"Dr. Kumar","x":55,"y":28,"city":"Lucknow","info":"Medical mentor" },
+    { "id":"m2","name":"Ms. Iyer","x":48,"y":60,"city":"Bengaluru","info":"Education mentor" }
+  ]
+}
