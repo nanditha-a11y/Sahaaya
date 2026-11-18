@@ -1,71 +1,143 @@
-import React, { useEffect, useState } from 'react'
-import { DashboardStats, getDashboardStats } from '../../api/client'
-import { useTranslation } from '../../i18n/useTranslation'
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import MetricCard from '../../components/MetricCard'
-import ChildCard from '../../components/ChildCard'
 import ChartCard from '../../components/ChartCard'
+import ChildCard from '../../components/ChildCard'
 import ActivityTimeline from '../../components/ActivityTimeline'
+import StatusBanner from '../../components/StatusBanner'
+import { useTranslation } from '../../i18n/useTranslation'
 import VintageIllustration from '../../components/VintageIllustration'
+import { getChildren, getDashboardStats, getDonorsOverview } from '../../api/client'
 
-export default function DonorHome(){
+export default function DonorHome() {
   const { t } = useTranslation() as any
-  const [totalDonations, setTotalDonations] = useState('$7,800')
 
-  useEffect(() => {
-    let active = true
-    const fallbackStats: DashboardStats = {
-      children: 92,
-      donations: { count: 0, total: 7800 },
-      resources: { count: 0, totalStock: 0 },
-      messages: 0
-    }
+  const statsQuery = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: () => getDashboardStats(),
+  })
 
-    getDashboardStats(fallbackStats).then(stats => {
-      if (active) {
-        setTotalDonations(`$${stats.donations.total.toLocaleString('en-US')}`)
-      }
-    })
+  const donorsQuery = useQuery({
+    queryKey: ['donors-overview'],
+    queryFn: () => getDonorsOverview(),
+  })
 
-    return () => {
-      active = false
-    }
-  }, [])
+  const childrenQuery = useQuery({
+    queryKey: ['children', 'all'],
+    queryFn: () => getChildren(),
+  })
 
-  const activities = [
-    {time:'1mo', title:'School kits distributed', desc:'Provided to 30 children'},
-    {time:'2mo', title:'Scholarship awarded', desc:'3 students received STEM grants'}
-  ]
+  const stats = statsQuery.data
+  const overview = donorsQuery.data
+  const children = childrenQuery.data ?? []
+
+  const totalDonations = stats ? `₹${stats.donations.total.toLocaleString()}` : '—'
+  const myDonationTotal =
+    overview && overview.myDonations.length > 0
+      ? overview.myDonations.reduce((sum, d) => sum + d.amount, 0)
+      : null
+
+  const activities =
+    overview && overview.myDonations.length > 0
+      ? overview.myDonations.slice(0, 4).map((d) => ({
+          time: d.donatedAt.slice(0, 10),
+          title: `Contributed ₹${d.amount.toLocaleString()}`,
+          desc: d.campaign?.title ?? 'General Welfare Fund',
+        }))
+      : (overview?.campaigns ?? []).slice(0, 3).map((c) => ({
+          time: `${c.progressPercent}%`,
+          title: c.title,
+          desc: `₹${c.raisedAmount.toLocaleString()} raised of ₹${c.targetAmount.toLocaleString()}`,
+        }))
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
         <div className="lg:col-span-2">
-          <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>{t('ThankYouDonate')}</h2>
-          <div className="text-sm" style={{color:'#4b3628'}}>{t('OverviewLine')}</div>
+          <h2 className="text-2xl handwritten" style={{ color: '#6b4c3b' }}>
+            {t('ThankYouDonate')}
+          </h2>
+          <div className="text-sm" style={{ color: '#4b3628' }}>
+            {t('OverviewLine')}
+          </div>
         </div>
         <div className="flex justify-end">
-          <VintageIllustration variant="donor" title={t('ThankYouDonate')} description={t('EmpoweringTitle')} />
+          <VintageIllustration
+            variant="donor"
+            title={t('ThankYouDonate')}
+            description={t('EmpoweringTitle')}
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <MetricCard title="Total Donations" value={totalDonations} />
-        <MetricCard title="Children Impacted" value={92} />
-        <MetricCard title="Scholarships Supported" value={12} />
+      <StatusBanner
+        loading={statsQuery.isLoading || donorsQuery.isLoading || childrenQuery.isLoading}
+        loadingText="Loading donor impact summary…"
+        error={
+          statsQuery.isError
+            ? statsQuery.error instanceof Error
+              ? statsQuery.error.message
+              : 'Unable to load donor dashboard.'
+            : null
+        }
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <MetricCard
+          title={myDonationTotal !== null ? 'Your Contributions' : 'Total Donations'}
+          value={
+            myDonationTotal !== null ? `₹${myDonationTotal.toLocaleString()}` : totalDonations
+          }
+        />
+        <MetricCard title="Children Impacted" value={stats ? stats.children : '—'} />
+        <MetricCard
+          title="Active Campaigns"
+          value={overview ? overview.campaigns.length : '—'}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ChartCard title="Donation Trends"><div className="h-36 flex items-center justify-center text-slate-500">[Trend chart]</div></ChartCard>
         <div className="lg:col-span-2">
+          <ChartCard title="Fund Allocation & Campaign Progress">
+            <div className="space-y-3 py-2">
+              {(overview?.campaigns ?? []).map((c) => (
+                <div key={c.id} className="space-y-1">
+                  <div className="flex justify-between text-xs" style={{ color: '#4b3628' }}>
+                    <span className="font-semibold">{c.title}</span>
+                    <span>
+                      ₹{c.raisedAmount.toLocaleString()} / ₹{c.targetAmount.toLocaleString()} (
+                      {c.progressPercent}%)
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[#e6d7c3] overflow-hidden">
+                    <div
+                      className="h-full"
+                      style={{ width: `${c.progressPercent}%`, background: '#8c5a2b' }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ChartCard>
+        </div>
+        <div>
           <ActivityTimeline events={activities} />
         </div>
       </div>
 
       <div>
-        <h3 className="handwritten text-lg" style={{color:'#6b4c3b'}}>Success Stories</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
-          <ChildCard name="Ravi" age={14} progress={85} />
-          <ChildCard name="Sana" age={16} progress={92} />
+        <h3 className="handwritten text-xl mb-3" style={{ color: '#6b4c3b' }}>
+          Children Supported
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {children.slice(0, 6).map((c) => (
+            <ChildCard
+              key={c.id}
+              name={c.name}
+              age={c.age}
+              progress={Math.min(100, 75 + (c.age % 20))}
+            />
+          ))}
         </div>
       </div>
     </div>

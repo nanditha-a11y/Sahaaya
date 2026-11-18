@@ -1,18 +1,19 @@
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express, { ErrorRequestHandler, RequestHandler } from 'express'
-import { Prisma, PrismaClient, UserRole } from '@prisma/client'
-import {
-  AuthenticatedRequest,
-  requireAuth,
-  requireRole,
-  verifySupabaseToken,
-} from './middleware/auth'
+import { Prisma, UserRole } from '@prisma/client'
+import { supabaseAdmin } from './lib/supabase'
+import { prisma } from './lib/validation'
+import { AuthenticatedRequest, requireAuth, requireRole } from './middleware/auth'
+import childrenRouter from './routes/children'
+import educationRouter from './routes/education'
+import healthRouter from './routes/health'
+import resourcesRouter from './routes/resources'
+import communityRouter from './routes/community'
 
 dotenv.config()
 
 const app = express()
-const prisma = new PrismaClient()
 const port = Number(process.env.PORT) || 5000
 
 app.use(
@@ -23,7 +24,8 @@ app.use(
 )
 app.use(express.json())
 
-const asyncHandler = (handler: RequestHandler): RequestHandler =>
+const asyncHandler =
+  (handler: RequestHandler): RequestHandler =>
   (request, response, next) => {
     Promise.resolve(handler(request, response, next)).catch(next)
   }
@@ -31,86 +33,166 @@ const asyncHandler = (handler: RequestHandler): RequestHandler =>
 const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0
 
-const ALLOWED_SIGNUP_ROLES: UserRole[] = [
+const ALLOWED_SELF_REGISTER_ROLES: UserRole[] = [
+  UserRole.DONOR,
+  UserRole.STUDENT,
   UserRole.STAFF,
   UserRole.EDUCATOR,
   UserRole.HEALTHCARE_STAFF,
-  UserRole.DONOR,
-  UserRole.STUDENT,
 ]
 
-// --- Auth & Profile Routes ---
+// ── Auth & Profile Provisioning ───────────────────────────────────────────────
 
 app.post(
   '/api/auth/register',
-  verifySupabaseToken,
-  asyncHandler(async (req: AuthenticatedRequest, res) => {
-    const authUserId = req.authUserId
-    const email = req.authEmail
-
-    if (!authUserId || !email) {
-      res.status(400).json({ error: 'Authenticated Supabase user email is missing.' })
+  asyncHandler(async (request, response) => {
+    const authHeader = request.headers.authorization
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      response.status(401).json({ error: 'Missing Supabase session token.' })
       return
     }
 
-    const { name, role } = req.body ?? {}
-    const safeName = isNonEmptyString(name) ? name.trim() : email.split('@')[0]
-    const safeRole: UserRole = ALLOWED_SIGNUP_ROLES.includes(role)
-      ? role
+    const token = authHeader.slice(7).trim()
+    const { data, error } = await supabaseAdmin.auth.getUser(token)
+    if (error || !data.user || !data.user.email) {
+      response.status(401).json({ error: 'Invalid Supabase session token.' })
+      return
+    }
+
+    const { name, role } = request.body ?? {}
+    const email = data.user.email.toLowerCase()
+    const requestedRole = Object.values(UserRole).includes(role)
+      ? (role as UserRole)
       : UserRole.DONOR
+
+    if (!ALLOWED_SELF_REGISTER_ROLES.includes(requestedRole)) {
+      response.status(400).json({ error: 'Invalid role selection.' })
+      return
+    }
 
     const org = await prisma.organization.findFirst()
     if (!org) {
-      res.status(500).json({ error: 'No organization configured. Run database seed first.' })
+      response.status(500).json({ error: 'No organization found. Run db:seed first.' })
       return
     }
+
+    const displayName = isNonEmptyString(name)
+      ? name.trim()
+      : (data.user.user_metadata?.name as string) || email.split('@')[0]
 
     const user = await prisma.user.upsert({
       where: { email },
       update: {
-        authId: authUserId,
-        name: safeName,
-        role: safeRole,
+        authId: data.user.id,
+        name: displayName,
       },
       create: {
-        authId: authUserId,
+        authId: data.user.id,
         email,
-        name: safeName,
-        role: safeRole,
-        isDemo: false,
+        name: displayName,
+        role: requestedRole,
         organizationId: org.id,
-      },
-      include: {
-        organization: { select: { id: true, name: true, city: true } },
+        isDemo: false,
       },
     })
 
-    if (safeRole === UserRole.DONOR) {
+    if (user.role === UserRole.DONOR) {
       await prisma.donor.upsert({
         where: { email },
-        update: { userId: user.id, name: safeName },
+        update: { userId: user.id, name: displayName },
         create: {
           userId: user.id,
-          name: safeName,
+          name: displayName,
           email,
           isDemo: false,
         },
       })
     }
 
-    res.status(201).json({ user })
+    await prisma.auditLog.create({
+      data: {
+        organizationId: org.id,
+        actorId: user.id,
+        action: 'USER_REGISTERED',
+        entityType: 'User',
+        entityId: user.id,
+        metadata: { role: user.role },
+      },
+    })
+
+    response.status(201).json({ user })
   })
 )
 
 app.get(
   '/api/auth/me',
   requireAuth,
-  asyncHandler(async (req: AuthenticatedRequest, res) => {
-    res.json({ user: req.user })
+  asyncHandler(async (request: AuthenticatedRequest, response) => {
+    const user = await prisma.user.findUnique({
+      where: { id: request.user!.id },
+      include: {
+        organization: { select: { id: true, name: true, city: true } },
+        donorProfile: true,
+        studentChild: true,
+      },
+    })
+
+    response.json({ user })
   })
 )
 
-// --- Core Sahaaya Endpoints ---
+app.get(
+  '/api/users',
+  requireAuth,
+  requireRole(UserRole.SUPER_ADMIN),
+  asyncHandler(async (_request, response) => {
+    const users = await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        isDemo: true,
+        createdAt: true,
+      },
+    })
+    response.json(users)
+  })
+)
+
+app.patch(
+  '/api/users/:id/role',
+  requireAuth,
+  requireRole(UserRole.SUPER_ADMIN),
+  asyncHandler(async (request: AuthenticatedRequest, response) => {
+    const { role } = request.body ?? {}
+    if (!Object.values(UserRole).includes(role)) {
+      response.status(400).json({ error: 'Invalid role provided.' })
+      return
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: request.params.id },
+      data: { role },
+    })
+
+    await prisma.auditLog.create({
+      data: {
+        organizationId: request.user!.organizationId,
+        actorId: request.user!.id,
+        action: 'UPDATE_USER_ROLE',
+        entityType: 'User',
+        entityId: updated.id,
+        metadata: { newRole: role },
+      },
+    })
+
+    response.json(updated)
+  })
+)
+
+// ── Dashboard & Public Wall Routes ────────────────────────────────────────────
 
 app.get(
   '/api/dashboard/stats',
@@ -138,110 +220,6 @@ app.get(
 )
 
 app.get(
-  '/api/children',
-  asyncHandler(async (_request, response) => {
-    const rows = await prisma.child.findMany({
-      where: { isArchived: false },
-      orderBy: { name: 'asc' },
-    })
-
-    response.json(
-      rows.map((c) => ({
-        id: c.id,
-        name: c.name,
-        age: c.age,
-        education: c.educationSummary,
-        health: c.healthSummary,
-        photo: c.photo,
-      }))
-    )
-  })
-)
-
-app.post(
-  '/api/children',
-  requireAuth,
-  requireRole(UserRole.SUPER_ADMIN, UserRole.STAFF),
-  asyncHandler(async (request: AuthenticatedRequest, response) => {
-    const { name, age, education, health, photo } = request.body ?? {}
-
-    if (
-      !isNonEmptyString(name) ||
-      !Number.isInteger(age) ||
-      age < 0 ||
-      !isNonEmptyString(education) ||
-      !isNonEmptyString(health) ||
-      !isNonEmptyString(photo)
-    ) {
-      response.status(400).json({
-        error: 'Expected name, non-negative integer age, education, health, and photo.',
-      })
-      return
-    }
-
-    const org = await prisma.organization.findFirst()
-    if (!org) {
-      response.status(500).json({ error: 'No organization configured. Run database seed first.' })
-      return
-    }
-
-    const count = await prisma.child.count()
-    const child = await prisma.child.create({
-      data: {
-        code: `SHY-${String(count + 1).padStart(3, '0')}`,
-        name: name.trim(),
-        age,
-        dateOfBirth: new Date(new Date().getFullYear() - age, 0, 1),
-        gender: 'Not specified',
-        admissionDate: new Date(),
-        educationSummary: education.trim(),
-        healthSummary: health.trim(),
-        photo: photo.trim(),
-        isDemo: false,
-        organizationId: org.id,
-      },
-    })
-
-    if (request.user) {
-      await prisma.auditLog.create({
-        data: {
-          organizationId: org.id,
-          actorId: request.user.id,
-          action: 'CREATE_CHILD',
-          entityType: 'Child',
-          entityId: child.id,
-        },
-      })
-    }
-
-    response.status(201).json({
-      id: child.id,
-      name: child.name,
-      age: child.age,
-      education: child.educationSummary,
-      health: child.healthSummary,
-      photo: child.photo,
-    })
-  })
-)
-
-app.get(
-  '/api/resources/:id',
-  asyncHandler(async (request, response) => {
-    const resource = await prisma.resource.findUnique({
-      where: { id: request.params.id },
-    })
-
-    if (!resource) {
-      response.status(404).json({ error: 'Resource not found.' })
-      return
-    }
-
-    response.json(resource)
-  })
-)
-
-app.get(
   '/api/messages',
   asyncHandler(async (_request, response) => {
     const rows = await prisma.message.findMany({
@@ -264,18 +242,21 @@ app.get(
 
 app.post(
   '/api/messages',
-  asyncHandler(async (request, response) => {
-    const { from, role, text } = request.body ?? {}
+  requireAuth,
+  asyncHandler(async (request: AuthenticatedRequest, response) => {
+    const { text } = request.body ?? {}
 
-    if (!isNonEmptyString(from) || !isNonEmptyString(role) || !isNonEmptyString(text)) {
-      response.status(400).json({ error: 'Expected from, role, and text.' })
+    if (!isNonEmptyString(text)) {
+      response.status(400).json({ error: 'Expected message text.' })
       return
     }
 
+    const user = request.user!
     const message = await prisma.message.create({
       data: {
-        fromName: from.trim(),
-        fromRole: role.trim(),
+        senderId: user.id,
+        fromName: user.name,
+        fromRole: user.role,
         text: text.trim(),
         isPublicWall: true,
         isDemo: false,
@@ -292,6 +273,14 @@ app.post(
   })
 )
 
+// ── Phase 3 Domain Routers ────────────────────────────────────────────────────
+
+app.use('/api/children', childrenRouter)
+app.use('/api/education', educationRouter)
+app.use('/api/health-records', healthRouter)
+app.use('/api/resources', resourcesRouter)
+app.use('/api', communityRouter)
+
 app.get(
   '/api/health',
   asyncHandler(async (_request, response) => {
@@ -299,6 +288,8 @@ app.get(
     response.json({ status: 'ok', database: 'connected' })
   })
 )
+
+// ── Error Handling & Server Lifecycle ─────────────────────────────────────────
 
 const errorHandler: ErrorRequestHandler = (error: unknown, _request, response, _next) => {
   if (error instanceof SyntaxError && 'body' in error) {
@@ -308,6 +299,11 @@ const errorHandler: ErrorRequestHandler = (error: unknown, _request, response, _
 
   if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
     response.status(409).json({ error: 'A record with that unique value already exists.' })
+    return
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+    response.status(404).json({ error: 'Requested record was not found.' })
     return
   }
 

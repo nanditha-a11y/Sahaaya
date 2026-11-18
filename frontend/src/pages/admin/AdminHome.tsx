@@ -1,100 +1,71 @@
-import React, { useEffect, useState } from 'react'
-import { DashboardStats, getDashboardStats } from '../../api/client'
-import { useTranslation } from '../../i18n/useTranslation'
-import VintageIllustration from '../../components/VintageIllustration'
+import React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import MetricCard from '../../components/MetricCard'
-import ProfileCard from '../../components/ProfileCard'
-import ProgressCard from '../../components/ProgressCard'
-import ActivityTimeline from '../../components/ActivityTimeline'
-import ImpactCard from '../../components/ImpactCard'
-import ChartCard from '../../components/ChartCard'
 import ChildCard from '../../components/ChildCard'
+import StatusBanner from '../../components/StatusBanner'
+import { getChildren, getDashboardStats } from '../../api/client'
 
-export default function AdminHome(){
-  const { t } = useTranslation() as any
-  const [metrics, setMetrics] = useState({
-    totalChildren: 128,
-    programs: 12,
-    donors: 54,
-    resources: 342,
-    scholarships: 23
+export default function AdminHome() {
+  const statsQuery = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: () => getDashboardStats(),
   })
-  useEffect(() => {
-    let active = true
-    const fallbackStats: DashboardStats = {
-      children: 128,
-      donations: { count: 54, total: 0 },
-      resources: { count: 342, totalStock: 342 },
-      messages: 0
-    }
 
-    getDashboardStats(fallbackStats).then(stats => {
-      if (active) {
-        setMetrics(current => ({
-          ...current,
-          totalChildren: stats.children,
-          donors: stats.donations.count,
-          resources: stats.resources.totalStock
-        }))
-      }
-    })
+  const childrenQuery = useQuery({
+    queryKey: ['children', 'recent'],
+    queryFn: () => getChildren(),
+  })
 
-    return () => {
-      active = false
-    }
-  }, [])
-  const activities = [
-    {time:'2h', title:'New admission: Aarav', desc:'Registered under education program'},
-    {time:'1d', title:'Donation received', desc:'₹50,000 via bank transfer'},
-    {time:'3d', title:'Health camp completed', desc:'Vaccinations and checkups for 45 children'}
-  ]
+  const stats = statsQuery.data
+  const recentChildren = (childrenQuery.data ?? []).slice(0, 6)
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
-        <div className="lg:col-span-2">
-          <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>{t('WelcomeBackAdmin')}</h2>
-          <div className="text-sm" style={{color:'#4b3628'}}>{t('OverviewLine')}</div>
-        </div>
-        <div className="flex justify-end">
-          <ProfileCard name="Admin" role="Sahaaya Manager" />
-        </div>
-      </div>
-      <div className="mt-4">
-        <VintageIllustration variant="admin" title={t('EmpoweringTitle')} description={t('OverviewLine')} />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <MetricCard title="Total Children" value={metrics.totalChildren} />
-        <MetricCard title="Active Programs" value={metrics.programs} />
-        <MetricCard title="Donors Connected" value={metrics.donors} />
-        <MetricCard title="Resources Available" value={metrics.resources} />
-        <MetricCard title="Scholarships" value={metrics.scholarships} />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ChartCard title="Child Welfare Overview">
-          <div className="h-40 flex items-center justify-center text-slate-500">[Placeholder chart]</div>
-        </ChartCard>
-        <div className="space-y-4 lg:col-span-2">
-          <ProgressCard title="Education Progress" percent={72} />
-          <ActivityTimeline events={activities} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="handwritten text-3xl" style={{ color: '#4b3628' }}>
+            Admin Dashboard
+          </h1>
+          <p className="text-sm" style={{ color: '#6b4c3b' }}>
+            Overview of children, donations, and inventory
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <ImpactCard title="Education" delta="+25%" />
-        <ImpactCard title="Health Records" delta="+30%" />
-        <ImpactCard title="Resource Efficiency" delta="+40%" />
+      <StatusBanner
+        loading={statsQuery.isLoading || childrenQuery.isLoading}
+        loadingText="Syncing live organization metrics…"
+        error={
+          statsQuery.isError
+            ? statsQuery.error instanceof Error
+              ? statsQuery.error.message
+              : 'Unable to load dashboard stats.'
+            : null
+        }
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <MetricCard title="Children" value={stats ? stats.children : '—'} />
+        <MetricCard
+          title="Donations"
+          value={stats ? `₹${stats.donations.total.toLocaleString()}` : '—'}
+        />
+        <MetricCard title="Resources" value={stats ? stats.resources.totalStock : '—'} />
       </div>
 
-      <div>
-        <h3 className="handwritten text-lg" style={{color:'#6b4c3b'}}>Recent Children</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
-          <ChildCard name="Aarav" age={7} progress={45} />
-          <ChildCard name="Meera" age={10} progress={80} />
-          <ChildCard name="Rohan" age={9} progress={60} />
-          <ChildCard name="Anya" age={8} progress={70} />
+      <div className="space-y-3">
+        <h2 className="handwritten text-xl" style={{ color: '#4b3628' }}>
+          Recent Children
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {recentChildren.map((c) => (
+            <ChildCard
+              key={c.id}
+              name={c.name}
+              age={c.age}
+              progress={Math.min(100, 75 + (c.age % 20))}
+            />
+          ))}
         </div>
       </div>
     </div>

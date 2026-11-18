@@ -1,52 +1,124 @@
-import React, { useEffect, useState } from 'react'
-import mockMessages from '../data/messages.json'
-import { motion } from 'framer-motion'
-import { getMessages, Message } from '../api/client'
+import React, { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getMessages, postMessage } from '../api/client'
+import StatusBanner from '../components/StatusBanner'
+import { useRole } from '../contexts/RoleContext'
 
-function Postcard({msg, idx, onOpen}:{msg:Message, idx:number, onOpen:(m:Message)=>void}){
-  const rot = (Math.random()-0.5)*8
-  const left = 10 + idx*12
-  return (
-    <motion.div initial={{rotate:rot-8, y:20}} animate={{rotate:rot, y:0}} whileHover={{scale:1.03}} className="absolute w-56 p-3 bg-[#fffdf7] paper-edge rounded shadow-lg" style={{left:`${left}%`, top:`${(idx%5)*10 + 8}%`, transform:`rotate(${rot}deg)`}} onClick={()=>onOpen(msg)}>
-      <div className="handwritten font-semibold" style={{color:'#6b4c3b'}}>{msg.from}</div>
-      <div className="text-xs mt-1" style={{color:'#4b3628'}}>{msg.text}</div>
-      <div className="text-xxs mt-2 text-[#7a5a44]">{msg.role} • {msg.date}</div>
-    </motion.div>
-  )
-}
+export default function MessageWall() {
+  const { profile, dbRole } = useRole()
+  const queryClient = useQueryClient()
+  const [fromName, setFromName] = useState(profile?.name ?? '')
+  const [text, setText] = useState('')
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(null)
 
-export default function MessageWall(){
-  const [messages, setMessages] = useState<Message[]>(mockMessages)
-  const [open, setOpen] = useState<Message | null>(null)
+  const messagesQuery = useQuery({
+    queryKey: ['messages'],
+    queryFn: () => getMessages(),
+  })
 
-  useEffect(() => {
-    let active = true
-    getMessages(mockMessages).then(result => {
-      if (active) setMessages(result)
-    })
+  const postMutation = useMutation({
+    mutationFn: (payload: { from: string; role: string; text: string }) => postMessage(payload),
+    onSuccess: () => {
+      setText('')
+      setFormError(null)
+      setFeedback('Your encouragement note has been pinned to the Message Wall.')
+      void queryClient.invalidateQueries({ queryKey: ['messages'] })
+      void queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+    },
+    onError: (err) => {
+      setFormError(err instanceof Error ? err.message : 'Unable to post message.')
+    },
+  })
 
-    return () => {
-      active = false
+  function handlePost(e: React.FormEvent) {
+    e.preventDefault()
+    setFormError(null)
+    setFeedback(null)
+
+    const sender = (fromName.trim() || profile?.name || 'Well-Wisher').trim()
+    if (!text.trim()) {
+      setFormError('Please write a short message before posting.')
+      return
     }
-  }, [])
+
+    postMutation.mutate({
+      from: sender,
+      role: dbRole ?? 'Supporter',
+      text: text.trim(),
+    })
+  }
+
+  const messages = messagesQuery.data ?? []
 
   return (
-    <div className="glass-card p-6 rounded-2xl paper-edge relative" style={{minHeight:420}}>
-      <h3 className="handwritten text-2xl" style={{color:'#6b4c3b'}}>Message of Hope Wall</h3>
-      <p className="text-sm" style={{color:'#7a5a44'}}>A corkboard of postcards pinned with love and stories.</p>
-
-      <div className="mt-4 relative h-96 bg-[url('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1400&auto=format&fit=crop&ixlib=rb-4.0.3&s=')] bg-cover rounded">
-        {messages.map((m, i)=>(<Postcard key={m.id} msg={m} idx={i} onOpen={setOpen} />))}
+    <div className="glass-card p-6 rounded-2xl paper-edge space-y-4">
+      <div>
+        <h3 className="handwritten text-2xl" style={{ color: '#6b4c3b' }}>
+          Encouragement & Gratitude Wall
+        </h3>
+        <p className="text-sm" style={{ color: '#7a5a44' }}>
+          Public notes of support, gratitude, and encouragement for our children.
+        </p>
       </div>
 
-      {open && (
-        <motion.div initial={{scale:0.9,opacity:0}} animate={{scale:1,opacity:1}} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-96 p-6 glass-card rounded-xl shadow-2xl">
-          <div className="handwritten text-xl" style={{color:'#6b4c3b'}}>{open.from}</div>
-          <div className="text-sm mt-2" style={{color:'#4b3628'}}>{open.text}</div>
-          <div className="text-xs mt-3 text-[#7a5a44]">{open.role} • {open.date}</div>
-          <div className="mt-4"><button className="btn-primary" onClick={()=>setOpen(null)}>Close</button></div>
-        </motion.div>
-      )}
+      <StatusBanner
+        loading={messagesQuery.isLoading}
+        loadingText="Loading message wall notes…"
+        error={
+          formError ??
+          (messagesQuery.isError
+            ? messagesQuery.error instanceof Error
+              ? messagesQuery.error.message
+              : 'Failed to load messages.'
+            : null)
+        }
+        success={feedback}
+        onDismissSuccess={() => setFeedback(null)}
+      />
+
+      <form onSubmit={handlePost} className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input
+          value={fromName}
+          onChange={(e) => setFromName(e.target.value)}
+          placeholder={profile?.name ?? 'Your name'}
+          className="p-2 rounded border text-sm"
+          style={{ background: '#fffdf7', borderColor: '#d9c2a6' }}
+        />
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Write a warm note of encouragement…"
+          className="md:col-span-2 p-2 rounded border text-sm"
+          style={{ background: '#fffdf7', borderColor: '#d9c2a6' }}
+        />
+        <button
+          type="submit"
+          disabled={postMutation.isPending}
+          className="btn-primary handwritten disabled:opacity-60"
+        >
+          {postMutation.isPending ? 'Pinning…' : 'Pin Note'}
+        </button>
+      </form>
+
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {messages.map((m) => (
+          <div key={m.id} className="polaroid p-4 rounded-xl">
+            <div className="text-sm font-semibold" style={{ color: '#5c4132' }}>
+              {m.from}{' '}
+              <span className="text-xs" style={{ color: '#8a6b54' }}>
+                ({m.role})
+              </span>
+            </div>
+            <div className="mt-2 text-sm" style={{ color: '#6b4c3b' }}>
+              “{m.text}”
+            </div>
+            <div className="mt-2 text-xs text-right" style={{ color: '#8a6b54' }}>
+              {m.date}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
