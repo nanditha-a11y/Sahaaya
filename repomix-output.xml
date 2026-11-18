@@ -40,96 +40,652 @@ The content is organized as follows:
 </file_summary>
 
 <directory_structure>
-src/
-  components/
-    ActivityTimeline.tsx
-    Card.tsx
-    ChartArea.tsx
-    ChartCard.tsx
-    ChildCard.tsx
-    EmptyState.tsx
-    IllustrationSection.tsx
-    ImpactCard.tsx
-    Metric.tsx
-    MetricCard.tsx
-    Navbar.tsx
-    ProfileCard.tsx
-    ProgressCard.tsx
-    RequireRole.tsx
-    ResourceCard.tsx
-    Sidebar.tsx
-    VintageIllustration.tsx
-  contexts/
-    RoleContext.tsx
-  data/
-    alumni.json
-    analytics.json
-    children.json
-    dreams.json
-    locations.json
-    messages.json
-    timeline.json
-    tree.json
-    vault.json
-  i18n/
-    locales/
+backend/
+  prisma/
+    migrations/
+      20261007132639_init/
+        migration.sql
+      20261007141704_add_portal_models/
+        migration.sql
+      migration_lock.toml
+    schema.prisma
+    seed.ts
+  src/
+    server.ts
+  .env
+  .gitignore
+  package.json
+  tsconfig.json
+frontend/
+  src/
+    api/
+      client.ts
+    components/
+      ActivityTimeline.tsx
+      Card.tsx
+      ChartArea.tsx
+      ChartCard.tsx
+      ChildCard.tsx
+      EmptyState.tsx
+      IllustrationSection.tsx
+      ImpactCard.tsx
+      Metric.tsx
+      MetricCard.tsx
+      Modal.tsx
+      Navbar.tsx
+      ProfileCard.tsx
+      ProgressCard.tsx
+      RequireRole.tsx
+      ResourceCard.tsx
+      Sidebar.tsx
+      VintageIllustration.tsx
+    contexts/
+      RoleContext.tsx
+    data/
+      alumni.json
+      analytics.json
+      children.json
+      dreams.json
+      locations.json
+      messages.json
+      timeline.json
+      tree.json
+      vault.json
+    i18n/
+      locales/
+        en.json
+        hi.json
+        kn.json
+        kok.json
+        ta.json
+        te.json
       en.json
       hi.json
+      i18n.ts
       kn.json
-      kok.json
-      ta.json
-      te.json
-    en.json
-    hi.json
-    i18n.ts
-    kn.json
-    translations.ts
-    useTranslation.tsx
-  modules/
-    AlumniMuseum.tsx
-    ChildGrowthTree.tsx
-    DreamBuilder.tsx
-    ImpactMap.tsx
-    LegacyDashboard.tsx
-    LifeTimeline.tsx
-    MemoryVault.tsx
-    MentorMarketplace.tsx
-    MessageWall.tsx
-    WellnessRadar.tsx
-  pages/
-    admin/
-      AdminHome.tsx
-    donor/
-      DonorHome.tsx
-    student/
-      StudentHome.tsx
-    ChildManagement.tsx
-    Dashboard.tsx
-    Donors.tsx
-    Education.tsx
-    Health.tsx
-    ImpactShowcase.tsx
-    Landing.tsx
-    Mentorship.tsx
-    Resources.tsx
-    RoleSelector.tsx
-    Scholarships.tsx
-  App.tsx
-  main.tsx
-  styles.css
-index.html
-package.json
-postcss.config.cjs
+      translations.ts
+      useTranslation.tsx
+    modules/
+      AlumniMuseum.tsx
+      ChildGrowthTree.tsx
+      DreamBuilder.tsx
+      ImpactMap.tsx
+      LegacyDashboard.tsx
+      LifeTimeline.tsx
+      MemoryVault.tsx
+      MentorMarketplace.tsx
+      MessageWall.tsx
+      WellnessRadar.tsx
+    pages/
+      admin/
+        AdminHome.tsx
+      auth/
+        AuthPage.tsx
+      donor/
+        DonorHome.tsx
+      portals/
+        AdminPortal.tsx
+        DonorPortal.tsx
+        StudentPortal.tsx
+      student/
+        StudentHome.tsx
+      ChildManagement.tsx
+      Dashboard.tsx
+      Donors.tsx
+      Education.tsx
+      Health.tsx
+      ImpactShowcase.tsx
+      Landing.tsx
+      Mentorship.tsx
+      Resources.tsx
+      RoleSelector.tsx
+      Scholarships.tsx
+    App.tsx
+    main.tsx
+    styles.css
+  .gitignore
+  index.html
+  package.json
+  tailwind.config.cjs
+  tsconfig.json
+  vite.config.ts
 README.md
-tailwind.config.cjs
-tsconfig.json
-vite.config.ts
 </directory_structure>
 
 <files>
 This section contains the contents of the repository's files.
 
-<file path="src/components/ActivityTimeline.tsx">
+<file path="backend/prisma/migrations/20261007132639_init/migration.sql">
+-- CreateTable
+CREATE TABLE "User" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "email" TEXT NOT NULL,
+    "name" TEXT
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+</file>
+
+<file path="backend/prisma/migrations/20261007141704_add_portal_models/migration.sql">
+-- CreateTable
+CREATE TABLE "Child" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "age" INTEGER NOT NULL,
+    "education" TEXT NOT NULL,
+    "health" TEXT NOT NULL,
+    "photo" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Donation" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "donorName" TEXT NOT NULL,
+    "total" REAL NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Resource" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "stock" INTEGER NOT NULL,
+    "lowThreshold" INTEGER NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "from" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "date" DATETIME NOT NULL
+);
+</file>
+
+<file path="backend/prisma/migrations/migration_lock.toml">
+# Please do not edit this file manually
+# It should be added in your version-control system (i.e. Git)
+provider = "sqlite"
+</file>
+
+<file path="backend/prisma/schema.prisma">
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+}
+
+model Child {
+  id        String @id
+  name      String
+  age       Int
+  education String
+  health    String
+  photo     String
+}
+
+model Donation {
+  id        String @id
+  donorName String
+  total     Float
+}
+
+model Resource {
+  id           String @id
+  name         String
+  stock        Int
+  lowThreshold Int
+}
+
+model Message {
+  id   String   @id
+  from String
+  role String
+  text String
+  date DateTime
+}
+</file>
+
+<file path="backend/prisma/seed.ts">
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+interface ChildSeed {
+  id: string
+  name: string
+  age: number
+  education: string
+  health: string
+  photo: string
+}
+
+interface MessageSeed {
+  id: string
+  from: string
+  role: string
+  text: string
+  date: string
+}
+
+const readFrontendData = <T>(fileName: string): T => {
+  const path = resolve(__dirname, '../../frontend/src/data', fileName)
+  return JSON.parse(readFileSync(path, 'utf8')) as T
+}
+
+async function main() {
+  const children = readFrontendData<ChildSeed[]>('children.json')
+  const messages = readFrontendData<MessageSeed[]>('messages.json')
+
+  for (const child of children) {
+    await prisma.child.upsert({
+      where: { id: child.id },
+      update: child,
+      create: child
+    })
+  }
+
+  const donations = [
+    { id: 'd1', donorName: 'R. Sharma', total: 1200 },
+    { id: 'd2', donorName: 'Global Philanthropy', total: 4200 },
+    { id: 'd3', donorName: 'Friends of Sahaaya', total: 2300 }
+  ]
+
+  for (const donation of donations) {
+    await prisma.donation.upsert({
+      where: { id: donation.id },
+      update: donation,
+      create: donation
+    })
+  }
+
+  const resources = [
+    { id: 'r1', name: 'Textbooks', stock: 120, lowThreshold: 20 },
+    { id: 'r2', name: 'Laptops', stock: 12, lowThreshold: 3 },
+    { id: 'r3', name: 'Uniforms', stock: 80, lowThreshold: 15 },
+    { id: 'r4', name: 'Medicines', stock: 40, lowThreshold: 10 }
+  ]
+
+  for (const resource of resources) {
+    await prisma.resource.upsert({
+      where: { id: resource.id },
+      update: resource,
+      create: resource
+    })
+  }
+
+  for (const message of messages) {
+    const data = { ...message, date: new Date(message.date) }
+    await prisma.message.upsert({
+      where: { id: message.id },
+      update: data,
+      create: data
+    })
+  }
+}
+
+main()
+  .catch((error: unknown) => {
+    console.error('Database seed failed:', error)
+    process.exitCode = 1
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
+</file>
+
+<file path="backend/src/server.ts">
+import { randomUUID } from 'node:crypto'
+import cors from 'cors'
+import dotenv from 'dotenv'
+import express, { ErrorRequestHandler, RequestHandler } from 'express'
+import { Prisma, PrismaClient } from '@prisma/client'
+
+dotenv.config()
+
+const app = express()
+const prisma = new PrismaClient()
+const port = Number(process.env.PORT) || 5000
+
+app.use(cors())
+app.use(express.json())
+
+const asyncHandler = (handler: RequestHandler): RequestHandler =>
+  (request, response, next) => {
+    Promise.resolve(handler(request, response, next)).catch(next)
+  }
+
+const isNonEmptyString = (value: unknown): value is string =>
+  typeof value === 'string' && value.trim().length > 0
+
+app.get('/api/dashboard/stats', asyncHandler(async (_request, response) => {
+  const [children, donations, resources, messages] = await Promise.all([
+    prisma.child.count(),
+    prisma.donation.aggregate({ _count: true, _sum: { total: true } }),
+    prisma.resource.aggregate({ _count: true, _sum: { stock: true } }),
+    prisma.message.count()
+  ])
+
+  response.json({
+    children,
+    donations: {
+      count: donations._count,
+      total: donations._sum.total ?? 0
+    },
+    resources: {
+      count: resources._count,
+      totalStock: resources._sum.stock ?? 0
+    },
+    messages
+  })
+}))
+
+app.get('/api/children', asyncHandler(async (_request, response) => {
+  const children = await prisma.child.findMany({ orderBy: { name: 'asc' } })
+  response.json(children)
+}))
+
+app.post('/api/children', asyncHandler(async (request, response) => {
+  const { id, name, age, education, health, photo } = request.body ?? {}
+
+  if (
+    (id !== undefined && !isNonEmptyString(id)) ||
+    !isNonEmptyString(name) ||
+    !Number.isInteger(age) ||
+    age < 0 ||
+    !isNonEmptyString(education) ||
+    !isNonEmptyString(health) ||
+    !isNonEmptyString(photo)
+  ) {
+    response.status(400).json({
+      error: 'Expected name, non-negative integer age, education, health, and photo.'
+    })
+    return
+  }
+
+  const child = await prisma.child.create({
+    data: {
+      id: id ?? randomUUID(),
+      name: name.trim(),
+      age,
+      education: education.trim(),
+      health: health.trim(),
+      photo: photo.trim()
+    }
+  })
+
+  response.status(201).json(child)
+}))
+
+app.get('/api/resources/:id', asyncHandler(async (request, response) => {
+  const resource = await prisma.resource.findUnique({
+    where: { id: request.params.id }
+  })
+
+  if (!resource) {
+    response.status(404).json({ error: 'Resource not found.' })
+    return
+  }
+
+  response.json(resource)
+}))
+
+app.get('/api/messages', asyncHandler(async (_request, response) => {
+  const messages = await prisma.message.findMany({ orderBy: { date: 'desc' } })
+  response.json(messages)
+}))
+
+app.post('/api/messages', asyncHandler(async (request, response) => {
+  const { id, from, role, text, date } = request.body ?? {}
+
+  if (
+    (id !== undefined && !isNonEmptyString(id)) ||
+    !isNonEmptyString(from) ||
+    !isNonEmptyString(role) ||
+    !isNonEmptyString(text) ||
+    (date !== undefined && (typeof date !== 'string' || Number.isNaN(Date.parse(date))))
+  ) {
+    response.status(400).json({
+      error: 'Expected from, role, text, and an optional valid date.'
+    })
+    return
+  }
+
+  const message = await prisma.message.create({
+    data: {
+      id: id ?? randomUUID(),
+      from: from.trim(),
+      role: role.trim(),
+      text: text.trim(),
+      date: date === undefined ? new Date() : new Date(date)
+    }
+  })
+
+  response.status(201).json(message)
+}))
+
+app.get('/api/health', (_request, response) => {
+  response.json({ status: 'ok' })
+})
+
+const errorHandler: ErrorRequestHandler = (error: unknown, _request, response, _next) => {
+  if (error instanceof SyntaxError && 'body' in error) {
+    response.status(400).json({ error: 'Request body must contain valid JSON.' })
+    return
+  }
+
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2002'
+  ) {
+    response.status(409).json({ error: 'A record with that id already exists.' })
+    return
+  }
+
+  console.error('API request failed:', error)
+  response.status(500).json({ error: 'An unexpected server error occurred.' })
+}
+
+app.use(errorHandler)
+
+const server = app.listen(port, () => {
+  console.log(`Backend server listening on port ${port}`)
+})
+
+const shutdown = () => {
+  server.close(() => {
+    void prisma.$disconnect()
+  })
+}
+
+process.on('SIGINT', shutdown)
+process.on('SIGTERM', shutdown)
+</file>
+
+<file path="backend/.env">
+PORT=5000
+DATABASE_URL="file:./dev.db"
+</file>
+
+<file path="backend/.gitignore">
+node_modules/
+dist/
+prisma/dev.db
+prisma/dev.db-journal
+</file>
+
+<file path="backend/package.json">
+{
+  "name": "sahaaya-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.6.0",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.2.2"
+  }
+}
+</file>
+
+<file path="backend/tsconfig.json">
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts"]
+}
+</file>
+
+<file path="frontend/src/api/client.ts">
+export interface Child {
+  id: string
+  name: string
+  age: number
+  education: string
+  health: string
+  photo: string
+}
+
+export interface Message {
+  id: string
+  from: string
+  role: string
+  text: string
+  date: string
+}
+
+export interface DashboardStats {
+  children: number
+  donations: {
+    count: number
+    total: number
+  }
+  resources: {
+    count: number
+    totalStock: number
+  }
+  messages: number
+}
+
+export type NewChild = Omit<Child, 'id'>
+
+const configuredApiBaseUrl = (import.meta as ImportMeta & {
+  env?: Record<string, string | undefined>
+}).env?.VITE_API_BASE_URL
+const apiBaseUrl = configuredApiBaseUrl ?? '/api'
+
+class ApiResponseError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message)
+    this.name = 'ApiResponseError'
+  }
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${apiBaseUrl}${path}`, {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...init?.headers
+    }
+  })
+
+  if (!response.ok) {
+    throw new ApiResponseError(
+      response.status,
+      `API request failed (${response.status} ${response.statusText})`
+    )
+  }
+
+  return response.json() as Promise<T>
+}
+
+export async function getDashboardStats(fallback: DashboardStats): Promise<DashboardStats> {
+  try {
+    return await request<DashboardStats>('/dashboard/stats')
+  } catch (error) {
+    console.warn('Using mock dashboard statistics because the API is unavailable.', error)
+    return fallback
+  }
+}
+
+export async function getChildren(fallback: Child[]): Promise<Child[]> {
+  try {
+    return await request<Child[]>('/children')
+  } catch (error) {
+    console.warn('Using mock children because the API is unavailable.', error)
+    return fallback
+  }
+}
+
+export async function createChild(child: NewChild): Promise<Child> {
+  try {
+    return await request<Child>('/children', {
+      method: 'POST',
+      body: JSON.stringify(child)
+    })
+  } catch (error) {
+    if (error instanceof ApiResponseError && error.status < 500) throw error
+    console.warn('Keeping the new child in local page state because the API is unavailable.', error)
+    return {
+      ...child,
+      id: `local-${Date.now()}`
+    }
+  }
+}
+
+export async function getMessages(fallback: Message[]): Promise<Message[]> {
+  try {
+    const messages = await request<Message[]>('/messages')
+    return messages.map(message => ({
+      ...message,
+      date: message.date.slice(0, 10)
+    }))
+  } catch (error) {
+    console.warn('Using mock messages because the API is unavailable.', error)
+    return fallback
+  }
+}
+</file>
+
+<file path="frontend/src/components/ActivityTimeline.tsx">
 import React from 'react'
 
 export default function ActivityTimeline({events}:{events:Array<{time:string, title:string, desc?:string}>}){
@@ -152,7 +708,7 @@ export default function ActivityTimeline({events}:{events:Array<{time:string, ti
 }
 </file>
 
-<file path="src/components/Card.tsx">
+<file path="frontend/src/components/Card.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -165,7 +721,7 @@ export default function Card({children,className}:{children:React.ReactNode,clas
 }
 </file>
 
-<file path="src/components/ChartArea.tsx">
+<file path="frontend/src/components/ChartArea.tsx">
 import React from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
@@ -185,7 +741,7 @@ export default function ChartArea({data}:{data:any[]}){
 }
 </file>
 
-<file path="src/components/ChartCard.tsx">
+<file path="frontend/src/components/ChartCard.tsx">
 import React from 'react'
 
 export default function ChartCard({title, children}:{title:string, children:React.ReactNode}){
@@ -198,7 +754,7 @@ export default function ChartCard({title, children}:{title:string, children:Reac
 }
 </file>
 
-<file path="src/components/ChildCard.tsx">
+<file path="frontend/src/components/ChildCard.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -217,7 +773,7 @@ export default function ChildCard({name, age, progress}:{name:string, age:number
 }
 </file>
 
-<file path="src/components/EmptyState.tsx">
+<file path="frontend/src/components/EmptyState.tsx">
 import React from 'react'
 import VintageIllustration from './VintageIllustration'
 
@@ -234,7 +790,7 @@ export default function EmptyState({title, desc}:{title:string, desc?:string}){
 }
 </file>
 
-<file path="src/components/IllustrationSection.tsx">
+<file path="frontend/src/components/IllustrationSection.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -282,7 +838,7 @@ export default function IllustrationSection({type='generic', title, description}
 }
 </file>
 
-<file path="src/components/ImpactCard.tsx">
+<file path="frontend/src/components/ImpactCard.tsx">
 import React from 'react'
 
 export default function ImpactCard({title, delta}:{title:string, delta:string}){
@@ -295,7 +851,7 @@ export default function ImpactCard({title, delta}:{title:string, delta:string}){
 }
 </file>
 
-<file path="src/components/Metric.tsx">
+<file path="frontend/src/components/Metric.tsx">
 import React, { useEffect, useState } from 'react'
 import { motion, useSpring } from 'framer-motion'
 
@@ -325,7 +881,7 @@ export default function Metric({value,label}:{value:number,label:string}){
 }
 </file>
 
-<file path="src/components/MetricCard.tsx">
+<file path="frontend/src/components/MetricCard.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -344,15 +900,77 @@ export default function MetricCard({title, value, icon, className}:{title:string
 }
 </file>
 
-<file path="src/components/Navbar.tsx">
+<file path="frontend/src/components/Modal.tsx">
+import React, { useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+
+interface ModalProps {
+  open: boolean
+  title: string
+  onClose: () => void
+  children: React.ReactNode
+}
+
+export default function Modal({ open, title, onClose, children }: ModalProps) {
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, onClose])
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#2b2b2b]/45 p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onMouseDown={event => {
+            if (event.target === event.currentTarget) onClose()
+          }}
+        >
+          <motion.section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="glass-card paper-edge w-full max-w-lg rounded-2xl p-6"
+            initial={{ opacity: 0, y: 16, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <h2 id="modal-title" className="handwritten text-2xl" style={{ color: '#6b4c3b' }}>{title}</h2>
+              <button type="button" onClick={onClose} className="rounded-lg px-3 py-1 hover:bg-[#6b4c3b]/10" aria-label="Close dialog">
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            {children}
+          </motion.section>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+</file>
+
+<file path="frontend/src/components/Navbar.tsx">
 import React from 'react'
 import { Menu } from 'lucide-react'
 import { useTranslation } from '../i18n/useTranslation'
 import { useRole } from '../contexts/RoleContext'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export default function Navbar({ onMenu }:{onMenu?: ()=>void}){
   const { t, lang, setLang } = useTranslation() as any
-  const { role, setRole } = useRole()
+  const { role } = useRole()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const routeRole = location.pathname.match(/^\/(?:login|register)\/(admin|student|donor)$/)?.[1]
+  const selectedRole = routeRole ?? role ?? 'admin'
 
   const languages = [
     {code:'en', label: 'English'},
@@ -380,7 +998,7 @@ export default function Navbar({ onMenu }:{onMenu?: ()=>void}){
           <label className="text-xs" style={{color:'#5a4433'}}>{t('Language')}</label>
         </div>
         <div className="flex items-center gap-2">
-          <select value={role||'admin'} onChange={e=>setRole(e.target.value as any)} className="rounded p-1 bg-white/80 text-sm">
+          <select value={selectedRole} onChange={e=>navigate(`/login/${e.target.value}`)} className="rounded p-1 bg-white/80 text-sm">
             <option value="admin">Admin View</option>
             <option value="student">Student View</option>
             <option value="donor">Donor View</option>
@@ -392,7 +1010,7 @@ export default function Navbar({ onMenu }:{onMenu?: ()=>void}){
 }
 </file>
 
-<file path="src/components/ProfileCard.tsx">
+<file path="frontend/src/components/ProfileCard.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -412,7 +1030,7 @@ export default function ProfileCard({name, role, avatar, children}:{name:string,
 }
 </file>
 
-<file path="src/components/ProgressCard.tsx">
+<file path="frontend/src/components/ProgressCard.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -438,21 +1056,21 @@ export default function ProgressCard({title, percent}:{title:string, percent:num
 }
 </file>
 
-<file path="src/components/RequireRole.tsx">
+<file path="frontend/src/components/RequireRole.tsx">
 import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useRole } from '../contexts/RoleContext'
 
 export default function RequireRole({children, allowed}:{children:JSX.Element, allowed: Array<'admin'|'student'|'donor'>}){
   const { role } = useRole()
-  if(!allowed.includes(role)){
-    return <Navigate to="/" replace />
+  if(!role || !allowed.includes(role)){
+    return <Navigate to={`/login/${allowed[0]}`} replace />
   }
   return children
 }
 </file>
 
-<file path="src/components/ResourceCard.tsx">
+<file path="frontend/src/components/ResourceCard.tsx">
 import React from 'react'
 
 export default function ResourceCard({name, count}:{name:string, count:number}){
@@ -465,7 +1083,7 @@ export default function ResourceCard({name, count}:{name:string, count:number}){
 }
 </file>
 
-<file path="src/components/Sidebar.tsx">
+<file path="frontend/src/components/Sidebar.tsx">
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from '../i18n/useTranslation'
@@ -474,6 +1092,7 @@ import { useRole } from '../contexts/RoleContext'
 export default function Sidebar({ open }:{open?:boolean}){
   const { t } = useTranslation() as any
   const { role } = useRole()
+  if (!role) return null
 
   const adminNav = [
     {to:'/admin', label: 'Dashboard'},
@@ -527,7 +1146,7 @@ export default function Sidebar({ open }:{open?:boolean}){
 }
 </file>
 
-<file path="src/components/VintageIllustration.tsx">
+<file path="frontend/src/components/VintageIllustration.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 
@@ -589,37 +1208,53 @@ export default function VintageIllustration({variant='landing', title, descripti
 }
 </file>
 
-<file path="src/contexts/RoleContext.tsx">
+<file path="frontend/src/contexts/RoleContext.tsx">
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
-type Role = 'admin'|'student'|'donor'
+export type Role = 'admin' | 'student' | 'donor'
 
-const RoleContext = createContext({
-  role: 'admin' as Role,
-  setRole: (r: Role)=>{}
-})
+const roles: Role[] = ['admin', 'student', 'donor']
 
-export const RoleProvider: React.FC<{children:React.ReactNode}> = ({children})=>{
-  const [role, setRole] = useState<Role>(()=> (localStorage.getItem('sahaaya:role') as Role) || 'admin')
-
-  useEffect(()=>{
-    localStorage.setItem('sahaaya:role', role)
-  },[role])
-
-  return <RoleContext.Provider value={{role, setRole}}>{children}</RoleContext.Provider>
+const getSavedRole = (): Role | null => {
+  const savedRole = localStorage.getItem('sahaaya:role')
+  return roles.includes(savedRole as Role) ? savedRole as Role : null
 }
 
-export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Role)=>void}
+interface RoleContextValue {
+  role: Role | null
+  setRole: (role: Role | null) => void
+}
+
+const RoleContext = createContext<RoleContextValue>({
+  role: null,
+  setRole: () => {}
+})
+
+export const RoleProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const [role, setRole] = useState<Role | null>(getSavedRole)
+
+  useEffect(() => {
+    if (role) {
+      localStorage.setItem('sahaaya:role', role)
+    } else {
+      localStorage.removeItem('sahaaya:role')
+    }
+  }, [role])
+
+  return <RoleContext.Provider value={{ role, setRole }}>{children}</RoleContext.Provider>
+}
+
+export const useRole = (): RoleContextValue => useContext(RoleContext)
 </file>
 
-<file path="src/data/alumni.json">
+<file path="frontend/src/data/alumni.json">
 [
   {"id":"al1","name":"Neha","photo":"https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60","title":"Software Engineer","story":"From orphanage to TechCorp engineer. Mentored by alumni network.","achievements":["B.Tech","Mentor Hours:120"],"timeline":[{"year":2018,"note":"Graduated High School"},{"year":2022,"note":"Graduated College"}]},
   {"id":"al2","name":"Amit","photo":"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=60","title":"Teacher","story":"Now teaching local children and giving back.","achievements":["B.Ed","Scholarship Recipient"],"timeline":[{"year":2017,"note":"Completed Training"},{"year":2019,"note":"Started Teaching"}]} 
 ]
 </file>
 
-<file path="src/data/analytics.json">
+<file path="frontend/src/data/analytics.json">
 {
   "ageDistribution": [
     {"name":"0-5","value":120},
@@ -637,7 +1272,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/data/children.json">
+<file path="frontend/src/data/children.json">
 [
   { "id": "c1", "name": "Asha", "age": 8, "education": "Grade 3", "health": "Good", "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60" },
   { "id": "c2", "name": "Rahul", "age": 11, "education": "Grade 6", "health": "Fair", "photo": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=60" },
@@ -645,7 +1280,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 ]
 </file>
 
-<file path="src/data/dreams.json">
+<file path="frontend/src/data/dreams.json">
 {
   "goals":[
     {"id":"g1","title":"Doctor","skills":["Biology","Physics","Communication"],"mentors":["Dr. Kumar"]},
@@ -658,7 +1293,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/data/locations.json">
+<file path="frontend/src/data/locations.json">
 {
   "center": { "x": 50, "y": 50 },
   "orphanages": [
@@ -681,7 +1316,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/data/messages.json">
+<file path="frontend/src/data/messages.json">
 [
   {"id":"m1","from":"R. Sharma","role":"Donor","text":"Keep shining, little ones. Your future is bright!","date":"2024-05-12"},
   {"id":"m2","from":"Amit","role":"Alumnus","text":"Grateful for the support that helped me become a teacher.","date":"2023-11-04"},
@@ -690,7 +1325,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 ]
 </file>
 
-<file path="src/data/timeline.json">
+<file path="frontend/src/data/timeline.json">
 [
   {"id":"t1","year":2016,"title":"Admission Day","type":"admission","photo":"https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=60","notes":"Joined the care home."},
   {"id":"t2","year":2018,"title":"First School Play","type":"achievement","photo":"https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=60","notes":"Played the lead role."},
@@ -699,7 +1334,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 ]
 </file>
 
-<file path="src/data/tree.json">
+<file path="frontend/src/data/tree.json">
 {
   "id":"c1",
   "name":"Asha",
@@ -719,7 +1354,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/data/vault.json">
+<file path="frontend/src/data/vault.json">
 {
   "items": [
     {"id":"v1","title":"Drawing - Summer","type":"drawing","src":"https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&q=60","desc":"Crayon drawing of home."},
@@ -730,7 +1365,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/locales/en.json">
+<file path="frontend/src/i18n/locales/en.json">
 {
   "Home": "Home",
   "Dashboard": "Dashboard",
@@ -758,7 +1393,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/locales/hi.json">
+<file path="frontend/src/i18n/locales/hi.json">
 {
   "Home": "मुख पृष्ठ",
   "Dashboard": "डैशबोर्ड",
@@ -786,7 +1421,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/locales/kn.json">
+<file path="frontend/src/i18n/locales/kn.json">
 {
   "Home": "ಮುಖಪುಟ",
   "Dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
@@ -814,7 +1449,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/locales/kok.json">
+<file path="frontend/src/i18n/locales/kok.json">
 {
   "Home": "घरे",
   "Dashboard": "डॅशबोर्ड",
@@ -842,7 +1477,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/locales/ta.json">
+<file path="frontend/src/i18n/locales/ta.json">
 {
   "Home": "முகப்பு",
   "Dashboard": "டேஷ்போர்டு",
@@ -870,7 +1505,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/locales/te.json">
+<file path="frontend/src/i18n/locales/te.json">
 {
   "Home": "హోమ్",
   "Dashboard": "డ్యాష్బోర్డ్",
@@ -898,7 +1533,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/en.json">
+<file path="frontend/src/i18n/en.json">
 {
   "Home": "Home",
   "Dashboard": "Dashboard",
@@ -926,7 +1561,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/hi.json">
+<file path="frontend/src/i18n/hi.json">
 {
   "Home": "मुख पृष्ठ",
   "Dashboard": "डैशबोर्ड",
@@ -954,7 +1589,7 @@ export const useRole = ()=> useContext(RoleContext) as {role:Role, setRole:(r:Ro
 }
 </file>
 
-<file path="src/i18n/i18n.ts">
+<file path="frontend/src/i18n/i18n.ts">
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import en from './locales/en.json'
@@ -981,7 +1616,7 @@ i18n
 export default i18n
 </file>
 
-<file path="src/i18n/kn.json">
+<file path="frontend/src/i18n/kn.json">
 {
   "Home": "ಮುಖಪುಟ",
   "Dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
@@ -1009,7 +1644,7 @@ export default i18n
 }
 </file>
 
-<file path="src/i18n/translations.ts">
+<file path="frontend/src/i18n/translations.ts">
 const translations: Record<string, Record<string, string>> = {
   en: {
     Home: 'Home',
@@ -1136,7 +1771,7 @@ const translations: Record<string, Record<string, string>> = {
 export default translations
 </file>
 
-<file path="src/i18n/useTranslation.tsx">
+<file path="frontend/src/i18n/useTranslation.tsx">
 import { useTranslation as useI18next } from 'react-i18next'
 import i18n from './i18n'
 
@@ -1150,7 +1785,7 @@ export const useTranslation = ()=>{
 }
 </file>
 
-<file path="src/modules/AlumniMuseum.tsx">
+<file path="frontend/src/modules/AlumniMuseum.tsx">
 import React, { useState } from 'react'
 import alumni from '../data/alumni.json'
 import { motion } from 'framer-motion'
@@ -1204,7 +1839,7 @@ export default function AlumniMuseum(){
 }
 </file>
 
-<file path="src/modules/ChildGrowthTree.tsx">
+<file path="frontend/src/modules/ChildGrowthTree.tsx">
 import React, { useEffect, useState } from 'react'
 import treeData from '../data/tree.json'
 import { motion } from 'framer-motion'
@@ -1296,7 +1931,7 @@ export default function ChildGrowthTree(){
 }
 </file>
 
-<file path="src/modules/DreamBuilder.tsx">
+<file path="frontend/src/modules/DreamBuilder.tsx">
 import React, { useState } from 'react'
 import goalsData from '../data/dreams.json'
 
@@ -1346,7 +1981,7 @@ export default function DreamBuilder(){
 }
 </file>
 
-<file path="src/modules/ImpactMap.tsx">
+<file path="frontend/src/modules/ImpactMap.tsx">
 import React, { useState } from 'react'
 import locations from '../data/locations.json'
 import { motion } from 'framer-motion'
@@ -1415,7 +2050,7 @@ export default function ImpactMap(){
 }
 </file>
 
-<file path="src/modules/LegacyDashboard.tsx">
+<file path="frontend/src/modules/LegacyDashboard.tsx">
 import React from 'react'
 
 export default function LegacyDashboard(){
@@ -1432,7 +2067,7 @@ export default function LegacyDashboard(){
 }
 </file>
 
-<file path="src/modules/LifeTimeline.tsx">
+<file path="frontend/src/modules/LifeTimeline.tsx">
 import React, { useState } from 'react'
 import events from '../data/timeline.json'
 import { motion } from 'framer-motion'
@@ -1469,7 +2104,7 @@ export default function LifeTimeline(){
 }
 </file>
 
-<file path="src/modules/MemoryVault.tsx">
+<file path="frontend/src/modules/MemoryVault.tsx">
 import React, { useState } from 'react'
 import vault from '../data/vault.json'
 import { motion } from 'framer-motion'
@@ -1519,7 +2154,7 @@ export default function MemoryVault(){
 }
 </file>
 
-<file path="src/modules/MentorMarketplace.tsx">
+<file path="frontend/src/modules/MentorMarketplace.tsx">
 import React from 'react'
 
 export default function MentorMarketplace(){
@@ -1533,12 +2168,13 @@ export default function MentorMarketplace(){
 }
 </file>
 
-<file path="src/modules/MessageWall.tsx">
-import React, { useState } from 'react'
-import messages from '../data/messages.json'
+<file path="frontend/src/modules/MessageWall.tsx">
+import React, { useEffect, useState } from 'react'
+import mockMessages from '../data/messages.json'
 import { motion } from 'framer-motion'
+import { getMessages, Message } from '../api/client'
 
-function Postcard({msg, idx, onOpen}:{msg:any, idx:number, onOpen:(m:any)=>void}){
+function Postcard({msg, idx, onOpen}:{msg:Message, idx:number, onOpen:(m:Message)=>void}){
   const rot = (Math.random()-0.5)*8
   const left = 10 + idx*12
   return (
@@ -1551,7 +2187,19 @@ function Postcard({msg, idx, onOpen}:{msg:any, idx:number, onOpen:(m:any)=>void}
 }
 
 export default function MessageWall(){
-  const [open, setOpen] = useState<any>(null)
+  const [messages, setMessages] = useState<Message[]>(mockMessages)
+  const [open, setOpen] = useState<Message | null>(null)
+
+  useEffect(() => {
+    let active = true
+    getMessages(mockMessages).then(result => {
+      if (active) setMessages(result)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   return (
     <div className="glass-card p-6 rounded-2xl paper-edge relative" style={{minHeight:420}}>
@@ -1559,7 +2207,7 @@ export default function MessageWall(){
       <p className="text-sm" style={{color:'#7a5a44'}}>A corkboard of postcards pinned with love and stories.</p>
 
       <div className="mt-4 relative h-96 bg-[url('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1400&auto=format&fit=crop&ixlib=rb-4.0.3&s=')] bg-cover rounded">
-        {messages.map((m:any, i:number)=>(<Postcard key={m.id} msg={m} idx={i} onOpen={setOpen} />))}
+        {messages.map((m, i)=>(<Postcard key={m.id} msg={m} idx={i} onOpen={setOpen} />))}
       </div>
 
       {open && (
@@ -1575,7 +2223,7 @@ export default function MessageWall(){
 }
 </file>
 
-<file path="src/modules/WellnessRadar.tsx">
+<file path="frontend/src/modules/WellnessRadar.tsx">
 import React from 'react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts'
 
@@ -1608,8 +2256,9 @@ export default function WellnessRadar(){
 }
 </file>
 
-<file path="src/pages/admin/AdminHome.tsx">
-import React from 'react'
+<file path="frontend/src/pages/admin/AdminHome.tsx">
+import React, { useEffect, useState } from 'react'
+import { DashboardStats, getDashboardStats } from '../../api/client'
 import { useTranslation } from '../../i18n/useTranslation'
 import VintageIllustration from '../../components/VintageIllustration'
 import MetricCard from '../../components/MetricCard'
@@ -1622,7 +2271,37 @@ import ChildCard from '../../components/ChildCard'
 
 export default function AdminHome(){
   const { t } = useTranslation() as any
-  const metrics = { totalChildren:128, programs:12, donors:54, resources:342, scholarships:23 }
+  const [metrics, setMetrics] = useState({
+    totalChildren: 128,
+    programs: 12,
+    donors: 54,
+    resources: 342,
+    scholarships: 23
+  })
+  useEffect(() => {
+    let active = true
+    const fallbackStats: DashboardStats = {
+      children: 128,
+      donations: { count: 54, total: 0 },
+      resources: { count: 342, totalStock: 342 },
+      messages: 0
+    }
+
+    getDashboardStats(fallbackStats).then(stats => {
+      if (active) {
+        setMetrics(current => ({
+          ...current,
+          totalChildren: stats.children,
+          donors: stats.donations.count,
+          resources: stats.resources.totalStock
+        }))
+      }
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
   const activities = [
     {time:'2h', title:'New admission: Aarav', desc:'Registered under education program'},
     {time:'1d', title:'Donation received', desc:'₹50,000 via bank transfer'},
@@ -1682,8 +2361,164 @@ export default function AdminHome(){
 }
 </file>
 
-<file path="src/pages/donor/DonorHome.tsx">
-import React from 'react'
+<file path="frontend/src/pages/auth/AuthPage.tsx">
+import React, { FormEvent, useState } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { Role, useRole } from '../../contexts/RoleContext'
+
+type AuthMode = 'login' | 'register'
+
+const roleLabels: Record<Role, string> = {
+  admin: 'Admin',
+  student: 'Student',
+  donor: 'Donor'
+}
+
+const isRole = (value: string | undefined): value is Role =>
+  value === 'admin' || value === 'student' || value === 'donor'
+
+export default function AuthPage({ mode }: { mode: AuthMode }) {
+  const { role: roleParam } = useParams()
+  const navigate = useNavigate()
+  const { setRole } = useRole()
+  const [error, setError] = useState('')
+
+  if (!isRole(roleParam)) return <Navigate to="/" replace />
+
+  const role = roleParam
+  const isRegistration = mode === 'register'
+
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError('')
+
+    const formData = new FormData(event.currentTarget)
+    const password = String(formData.get('password') ?? '')
+
+    if (password.length < 8 || !/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+      setError('Use at least 8 characters, including an uppercase letter, lowercase letter, and number.')
+      return
+    }
+
+    if (isRegistration) {
+      const name = String(formData.get('name') ?? '').trim()
+      const confirmation = String(formData.get('confirmPassword') ?? '')
+      if (name.length < 2) {
+        setError('Enter a name with at least 2 characters.')
+        return
+      }
+      if (password !== confirmation) {
+        setError('Passwords do not match.')
+        return
+      }
+    }
+
+    setRole(role)
+    navigate(`/${role}`, { replace: true })
+  }
+
+  const alternatePath = `/${isRegistration ? 'login' : 'register'}/${role}`
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-xl mx-auto"
+    >
+      <div className="glass-card paper-edge rounded-2xl p-6 sm:p-8">
+        <div className="text-center mb-6">
+          <h1 className="handwritten text-3xl" style={{ color: '#6b4c3b' }}>
+            {roleLabels[role]} {isRegistration ? 'Registration' : 'Login'}
+          </h1>
+          <p className="text-sm mt-2" style={{ color: '#4b3628' }}>
+            {isRegistration
+              ? `Create your ${roleLabels[role].toLowerCase()} portal profile.`
+              : `Continue to the ${roleLabels[role].toLowerCase()} portal.`}
+          </p>
+        </div>
+
+        <form className="space-y-4" onSubmit={submit}>
+          {isRegistration && (
+            <label className="block text-sm" style={{ color: '#4b3628' }}>
+              Full name
+              <input
+                name="name"
+                type="text"
+                autoComplete="name"
+                minLength={2}
+                required
+                className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]"
+              />
+            </label>
+          )}
+
+          <label className="block text-sm" style={{ color: '#4b3628' }}>
+            Email address
+            <input
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]"
+            />
+          </label>
+
+          <label className="block text-sm" style={{ color: '#4b3628' }}>
+            Password
+            <input
+              name="password"
+              type="password"
+              autoComplete={isRegistration ? 'new-password' : 'current-password'}
+              minLength={8}
+              required
+              className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]"
+            />
+          </label>
+
+          {isRegistration && (
+            <label className="block text-sm" style={{ color: '#4b3628' }}>
+              Confirm password
+              <input
+                name="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]"
+              />
+            </label>
+          )}
+
+          {error && (
+            <p role="alert" className="rounded-lg border border-red-800/20 bg-red-50 p-3 text-sm text-red-900">
+              {error}
+            </p>
+          )}
+
+          <button type="submit" className="btn-primary handwritten w-full text-lg">
+            {isRegistration ? 'Create account' : 'Continue'}
+          </button>
+        </form>
+
+        <p className="mt-5 text-center text-sm" style={{ color: '#4b3628' }}>
+          {isRegistration ? 'Already registered?' : 'New to Sahaaya?'}{' '}
+          <Link className="font-semibold underline" style={{ color: '#6b4c3b' }} to={alternatePath}>
+            {isRegistration ? 'Login' : 'Create an account'}
+          </Link>
+        </p>
+        <p className="mt-3 text-center text-xs" style={{ color: '#7a5a44' }}>
+          Demo portal access is stored on this device.
+        </p>
+      </div>
+    </motion.section>
+  )
+}
+</file>
+
+<file path="frontend/src/pages/donor/DonorHome.tsx">
+import React, { useEffect, useState } from 'react'
+import { DashboardStats, getDashboardStats } from '../../api/client'
 import { useTranslation } from '../../i18n/useTranslation'
 import MetricCard from '../../components/MetricCard'
 import ChildCard from '../../components/ChildCard'
@@ -1693,6 +2528,27 @@ import VintageIllustration from '../../components/VintageIllustration'
 
 export default function DonorHome(){
   const { t } = useTranslation() as any
+  const [totalDonations, setTotalDonations] = useState('$7,800')
+
+  useEffect(() => {
+    let active = true
+    const fallbackStats: DashboardStats = {
+      children: 92,
+      donations: { count: 0, total: 7800 },
+      resources: { count: 0, totalStock: 0 },
+      messages: 0
+    }
+
+    getDashboardStats(fallbackStats).then(stats => {
+      if (active) {
+        setTotalDonations(`$${stats.donations.total.toLocaleString('en-US')}`)
+      }
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const activities = [
     {time:'1mo', title:'School kits distributed', desc:'Provided to 30 children'},
@@ -1712,7 +2568,7 @@ export default function DonorHome(){
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <MetricCard title="Total Donations" value="$7,800" />
+        <MetricCard title="Total Donations" value={totalDonations} />
         <MetricCard title="Children Impacted" value={92} />
         <MetricCard title="Scholarships Supported" value={12} />
       </div>
@@ -1736,8 +2592,33 @@ export default function DonorHome(){
 }
 </file>
 
-<file path="src/pages/student/StudentHome.tsx">
-import React from 'react'
+<file path="frontend/src/pages/portals/AdminPortal.tsx">
+import AdminHome from '../admin/AdminHome'
+
+export default function AdminPortal() {
+  return <AdminHome />
+}
+</file>
+
+<file path="frontend/src/pages/portals/DonorPortal.tsx">
+import DonorHome from '../donor/DonorHome'
+
+export default function DonorPortal() {
+  return <DonorHome />
+}
+</file>
+
+<file path="frontend/src/pages/portals/StudentPortal.tsx">
+import StudentHome from '../student/StudentHome'
+
+export default function StudentPortal() {
+  return <StudentHome />
+}
+</file>
+
+<file path="frontend/src/pages/student/StudentHome.tsx">
+import React, { useEffect, useState } from 'react'
+import { getChildren } from '../../api/client'
 import { useTranslation } from '../../i18n/useTranslation'
 import ProfileCard from '../../components/ProfileCard'
 import ProgressCard from '../../components/ProgressCard'
@@ -1746,8 +2627,27 @@ import ChildCard from '../../components/ChildCard'
 import ChartCard from '../../components/ChartCard'
 import VintageIllustration from '../../components/VintageIllustration'
 
+const studentName = 'Meera'
+
 export default function StudentHome(){
   const { t } = useTranslation() as any
+  const [student, setStudent] = useState({ name: studentName, age: 10 })
+
+  useEffect(() => {
+    let active = true
+    getChildren([]).then(children => {
+      const matchingStudent = children.find(
+        child => child.name.toLocaleLowerCase() === studentName.toLocaleLowerCase()
+      )
+      if (active && matchingStudent) {
+        setStudent({ name: matchingStudent.name, age: matchingStudent.age })
+      }
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const activities = [
     {time:'Tomorrow', title:'Math Class', desc:'Practice times tables'},
@@ -1762,7 +2662,7 @@ export default function StudentHome(){
           <div className="text-sm" style={{color:'#4b3628'}}>{t('OverviewLine')}</div>
         </div>
         <div className="flex justify-end">
-          <ProfileCard name="Meera" role="Student" />
+          <ProfileCard name={student.name} role="Student" />
         </div>
       </div>
       <div className="mt-4">
@@ -1773,7 +2673,7 @@ export default function StudentHome(){
         <ProgressCard title="Learning Progress" percent={68} />
         <ChartCard title="Recent Grades"><div className="h-28 flex items-center justify-center text-slate-500">[Grades chart]</div></ChartCard>
         <div className="space-y-4">
-          <ChildCard name="Meera" age={10} progress={68} />
+          <ChildCard name={student.name} age={student.age} progress={68} />
           <ActivityTimeline events={activities} />
         </div>
       </div>
@@ -1787,23 +2687,71 @@ export default function StudentHome(){
 }
 </file>
 
-<file path="src/pages/ChildManagement.tsx">
-import React from 'react'
+<file path="frontend/src/pages/ChildManagement.tsx">
+import React, { FormEvent, useEffect, useState } from 'react'
 import childrenData from '../data/children.json'
 import Card from '../components/Card'
+import { Child, createChild, getChildren } from '../api/client'
+import Modal from '../components/Modal'
 
 export default function ChildManagement(){
+  const [children, setChildren] = useState<Child[]>(childrenData)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    getChildren(childrenData).then(result => {
+      if (active) setChildren(result)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const addChild = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const age = Number(formData.get('age'))
+    if (!Number.isInteger(age) || age < 0) {
+      setSubmitError('Enter a valid non-negative age.')
+      return
+    }
+    setSubmitError('')
+    setIsSubmitting(true)
+    try {
+      const child = await createChild({
+        name: String(formData.get('name')).trim(),
+        age,
+        education: String(formData.get('education')).trim(),
+        health: String(formData.get('health')).trim(),
+        photo: String(formData.get('photo')).trim()
+      })
+      setChildren(current => [...current, child])
+      form.reset()
+      setIsAddModalOpen(false)
+    } catch (error) {
+      console.error('Could not add child.', error)
+      setSubmitError(error instanceof Error ? error.message : 'Could not add child.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl handwritten" style={{color:'#6b4c3b'}}>Stories & Memories</h2>
         <div>
-          <button className="btn-primary handwritten">Add Memory</button>
+          <button className="btn-primary handwritten" onClick={() => setIsAddModalOpen(true)}>Add Memory</button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {childrenData.map(child => (
+        {children.map(child => (
           <Card key={child.id} className="p-4">
             <div className="flex items-start gap-4">
               <div className="w-20 h-20 overflow-hidden rounded-md paper-edge">
@@ -1818,12 +2766,50 @@ export default function ChildManagement(){
           </Card>
         ))}
       </div>
+
+      <Modal open={isAddModalOpen} title="Add Child Record" onClose={() => setIsAddModalOpen(false)}>
+        <form className="space-y-4" onSubmit={addChild}>
+          <label className="block text-sm" style={{ color: '#4b3628' }}>
+            Child name
+            <input name="name" type="text" required minLength={2} maxLength={100} className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]" />
+          </label>
+          <label className="block text-sm" style={{ color: '#4b3628' }}>
+            Age
+            <input name="age" type="number" required min={0} step={1} className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]" />
+          </label>
+          <label className="block text-sm" style={{ color: '#4b3628' }}>
+            Education level
+            <input name="education" type="text" required maxLength={100} className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]" />
+          </label>
+          <label className="block text-sm" style={{ color: '#4b3628' }}>
+            Health status
+            <input name="health" type="text" required maxLength={100} className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]" />
+          </label>
+          <label className="block text-sm" style={{ color: '#4b3628' }}>
+            Photo URL
+            <input name="photo" type="url" required className="mt-1 w-full rounded-lg border border-[#6b4c3b]/20 bg-[#fffdf7] p-3 outline-none focus:border-[#6b4c3b]" />
+          </label>
+          {submitError && (
+            <p role="alert" className="rounded-lg border border-red-800/20 bg-red-50 p-3 text-sm text-red-900">
+              {submitError}
+            </p>
+          )}
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" className="rounded-lg border border-[#6b4c3b]/30 px-4 py-2 handwritten" onClick={() => setIsAddModalOpen(false)}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary handwritten" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving…' : 'Save Child'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }
 </file>
 
-<file path="src/pages/Dashboard.tsx">
+<file path="frontend/src/pages/Dashboard.tsx">
 import React from 'react'
 import Card from '../components/Card'
 import Metric from '../components/Metric'
@@ -1852,7 +2838,7 @@ export default function Dashboard(){
 }
 </file>
 
-<file path="src/pages/Donors.tsx">
+<file path="frontend/src/pages/Donors.tsx">
 import React from 'react'
 import Card from '../components/Card'
 
@@ -1880,7 +2866,7 @@ export default function Donors(){
 }
 </file>
 
-<file path="src/pages/Education.tsx">
+<file path="frontend/src/pages/Education.tsx">
 import React from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import Card from '../components/Card'
@@ -1922,7 +2908,7 @@ export default function Education(){
 }
 </file>
 
-<file path="src/pages/Health.tsx">
+<file path="frontend/src/pages/Health.tsx">
 import React from 'react'
 import WellnessRadar from '../modules/WellnessRadar'
 import Card from '../components/Card'
@@ -1947,7 +2933,7 @@ export default function Health(){
 }
 </file>
 
-<file path="src/pages/ImpactShowcase.tsx">
+<file path="frontend/src/pages/ImpactShowcase.tsx">
 import React from 'react'
 import { motion } from 'framer-motion'
 import Card from '../components/Card'
@@ -1990,7 +2976,7 @@ export default function ImpactShowcase(){
 }
 </file>
 
-<file path="src/pages/Landing.tsx">
+<file path="frontend/src/pages/Landing.tsx">
 import React from 'react'
 import Card from '../components/Card'
 import Metric from '../components/Metric'
@@ -2055,7 +3041,7 @@ export default function Landing(){
 }
 </file>
 
-<file path="src/pages/Mentorship.tsx">
+<file path="frontend/src/pages/Mentorship.tsx">
 import React from 'react'
 import Card from '../components/Card'
 
@@ -2082,7 +3068,7 @@ export default function Mentorship(){
 }
 </file>
 
-<file path="src/pages/Resources.tsx">
+<file path="frontend/src/pages/Resources.tsx">
 import React from 'react'
 import Card from '../components/Card'
 
@@ -2111,21 +3097,18 @@ export default function Resources(){
 }
 </file>
 
-<file path="src/pages/RoleSelector.tsx">
+<file path="frontend/src/pages/RoleSelector.tsx">
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from '../i18n/useTranslation'
-import { useRole } from '../contexts/RoleContext'
 import VintageIllustration from '../components/VintageIllustration'
 
 export default function RoleSelector(){
   const nav = useNavigate()
   const { t } = useTranslation() as any
-  const { setRole } = useRole()
 
   const choose = (r:'admin'|'student'|'donor')=>{
-    setRole(r)
-    nav(`/${r}`)
+    nav(`/login/${r}`)
   }
 
   return (
@@ -2149,7 +3132,7 @@ export default function RoleSelector(){
 }
 </file>
 
-<file path="src/pages/Scholarships.tsx">
+<file path="frontend/src/pages/Scholarships.tsx">
 import React from 'react'
 import Card from '../components/Card'
 
@@ -2176,15 +3159,16 @@ export default function Scholarships(){
 }
 </file>
 
-<file path="src/App.tsx">
+<file path="frontend/src/App.tsx">
 import React, { useState } from 'react'
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Landing from './pages/Landing'
 import RoleSelector from './pages/RoleSelector'
-import AdminHome from './pages/admin/AdminHome'
-import StudentHome from './pages/student/StudentHome'
-import DonorHome from './pages/donor/DonorHome'
+import AuthPage from './pages/auth/AuthPage'
+import AdminPortal from './pages/portals/AdminPortal'
+import StudentPortal from './pages/portals/StudentPortal'
+import DonorPortal from './pages/portals/DonorPortal'
 import { RoleProvider } from './contexts/RoleContext'
 import RequireRole from './components/RequireRole'
 import Dashboard from './pages/Dashboard'
@@ -2221,11 +3205,13 @@ export default function App(){
         <main className="flex-1 p-6 notebook">
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname} initial={{opacity:0, x:20}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-20}} transition={{duration:0.4}}>
-              <Routes location={location} key={location.pathname}>
+              <Routes>
                 <Route path="/" element={<RoleSelector/>} />
-                <Route path="/admin" element={<RequireRole allowed={[ 'admin' ]}><AdminHome/></RequireRole>} />
-                <Route path="/student" element={<RequireRole allowed={[ 'student' ]}><StudentHome/></RequireRole>} />
-                <Route path="/donor" element={<RequireRole allowed={[ 'donor' ]}><DonorHome/></RequireRole>} />
+                <Route path="/login/:role" element={<AuthPage mode="login" />} />
+                <Route path="/register/:role" element={<AuthPage mode="register" />} />
+                <Route path="/admin" element={<RequireRole allowed={[ 'admin' ]}><AdminPortal/></RequireRole>} />
+                <Route path="/student" element={<RequireRole allowed={[ 'student' ]}><StudentPortal/></RequireRole>} />
+                <Route path="/donor" element={<RequireRole allowed={[ 'donor' ]}><DonorPortal/></RequireRole>} />
                 <Route path="/landing" element={<Landing/>} />
                 <Route path="/dashboard" element={<Dashboard/>} />
                 <Route path="/children" element={<ChildManagement/>} />
@@ -2257,7 +3243,7 @@ export default function App(){
 }
 </file>
 
-<file path="src/main.tsx">
+<file path="frontend/src/main.tsx">
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
@@ -2276,10 +3262,9 @@ createRoot(document.getElementById('root')!).render(
 )
 </file>
 
-<file path="src/styles.css">
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+<file path="frontend/src/styles.css">
+@import "tailwindcss";
+@config "../tailwind.config.cjs";
 
 :root{
   --paper: linear-gradient(180deg, #fbf6ef 0%, #f5ecdb 100%);
@@ -2347,7 +3332,12 @@ body{
 .vintage-badge{background:#efe0d0;border-radius:999px;padding:6px 10px;border:1px solid rgba(107,76,59,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
 </file>
 
-<file path="index.html">
+<file path="frontend/.gitignore">
+node_modules/
+dist/
+</file>
+
+<file path="frontend/index.html">
 <!doctype html>
 <html>
   <head>
@@ -2366,74 +3356,44 @@ body{
   </html>
 </file>
 
-<file path="package.json">
+<file path="frontend/package.json">
 {
   "name": "sahaaya-platform",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "framer-motion": "^10.12.16",
-    "lucide-react": "^0.268.0",
     "i18next": "^23.0.1",
-    "react-i18next": "^13.0.2",
+    "lucide-react": "^0.268.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.14.1",
+    "react-i18next": "^13.0.2",
+    "react-router-dom": "^7.18.4",
     "recharts": "^2.6.2"
   },
   "devDependencies": {
-    "@types/react": "^18.2.21",
     "@types/node": "^20.6.0",
+    "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.30",
-    "tailwindcss": "^3.4.17",
+    "@vitejs/plugin-react": "^6.1.2",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.2.2",
-    "vite": "^5.1.0"
+    "vite": "^8.3.3"
   }
 }
 </file>
 
-<file path="postcss.config.cjs">
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {}
-  }
-}
-</file>
-
-<file path="README.md">
-# SAHAAYA — Digital Child Welfare Platform (Prototype)
-
-Empowering Every Child Through Care, Education and Opportunity
-
-This repository is a UI prototype for `SAHAAYA` — a digital child welfare and orphanage management platform built with React, TypeScript, Tailwind CSS, Framer Motion and Recharts.
-
-Quick start:
-
-```bash
-npm install
-npm run dev
-```
-
-Pages included:
-- Landing
-- Dashboard
-- Child management
-
-Notes:
-- This is a frontend prototype using mock JSON data under `src/data`.
-- Install dependencies and run the Vite dev server.
-</file>
-
-<file path="tailwind.config.cjs">
+<file path="frontend/tailwind.config.cjs">
 module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"] ,
   theme: {
@@ -2455,7 +3415,7 @@ module.exports = {
 }
 </file>
 
-<file path="tsconfig.json">
+<file path="frontend/tsconfig.json">
 {
   "compilerOptions": {
     "target": "ESNext",
@@ -2463,7 +3423,7 @@ module.exports = {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
     "skipLibCheck": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -2479,14 +3439,61 @@ module.exports = {
 }
 </file>
 
-<file path="vite.config.ts">
+<file path="frontend/vite.config.ts">
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [react()],
-  server: { port: 5173 }
+  plugins: [react(), tailwindcss()],
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': 'http://localhost:5000'
+    }
+  }
 })
+</file>
+
+<file path="README.md">
+# SAHAAYA — Digital Child Welfare Platform (Prototype)
+
+Empowering Every Child Through Care, Education and Opportunity
+
+This repository is a UI prototype for `SAHAAYA` — a digital child welfare and orphanage management platform built with React, TypeScript, Tailwind CSS, Framer Motion and Recharts.
+
+Quick start:
+
+```bash
+npm install --prefix frontend
+npm run dev --prefix frontend
+```
+
+Frontend requirements: Node.js 20.19+ or 22.12+.
+
+Backend setup:
+
+```bash
+npm install --prefix backend
+npm run dev --prefix backend
+```
+
+The API listens on port `5000` and provides:
+- `GET /api/dashboard/stats`
+- `GET` and `POST /api/children`
+- `GET /api/resources/:id`
+- `GET` and `POST /api/messages`
+
+Pages included:
+- Landing
+- Dashboard
+- Child management
+
+Notes:
+- This is a frontend prototype using mock JSON data under `frontend/src/data`.
+- The Express backend is isolated under `backend/`.
+- Run `npm run db:migrate --prefix backend` to initialize its SQLite database.
+- Run `npm run db:seed --prefix backend` to seed SQLite with the existing child, donor, resource, and message data.
 </file>
 
 </files>
